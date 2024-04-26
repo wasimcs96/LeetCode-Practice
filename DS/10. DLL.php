@@ -434,7 +434,7 @@ class DLL{
         // }
 
         //Optimize Approch
-        if($this->head == null) return;
+        if($this->head == null || $this->head->next == null) return;
         $currentNode = $this->head;
         while($currentNode != null){
             $prev = $currentNode->prev;

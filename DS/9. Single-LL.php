@@ -24,6 +24,27 @@ class linkedList{
         }
     }
 
+    public function insertNodeAtEnd1($data, $index){
+        $newNode = new Node($data);
+        $currentNode = $this->head;
+        $countIndex = 0; $loopStartIndex = "";
+        if($this->head == null) {
+            $this->head = $newNode;
+        }elseif($currentNode->next == null){
+            $currentNode->next = $newNode;
+            $newNode->next = $currentNode;
+        }else{
+            while($currentNode->next !== null){ 
+                if($countIndex == $index) $loopStartIndex = $currentNode;
+                $currentNode = $currentNode->next;
+                $countIndex++;
+            }
+            $currentNode->next = $newNode;
+            $newNode->next = $loopStartIndex;
+            //print_r($newNode);
+        }
+    }
+
     public function insertNodeAtHead($data){
         $newNode = new Node($data);
         if($this->head == null) {
@@ -228,28 +249,196 @@ class linkedList{
         }
     }
 
+    //https://leetcode.com/problems/middle-of-the-linked-list/
+    public function middleOfLL(){
+        if($this->head == null || $this->head->next == null) return;
+        //2N approch
+        // $currentNode = $this->head;
+        // $length = $this->getlengthLL();
+        // $midLength = floor ($length / 2);
+        // $counter = 1;
+        // while($counter <= $midLength){
+        //     $counter++;
+        //     $currentNode = $currentNode->next;
+        // }
+        // $this->head = $currentNode;
+        // return;
+
+        //O(N) approch
+        $slowPtr = $fastPtr = $this->head;
+
+        while($fastPtr != null && $fastPtr->next != null){
+            echo $slowPtr->data ."--".$fastPtr->data."\n";
+            $slowPtr = $slowPtr->next;
+            $fastPtr = $fastPtr->next->next;
+            
+        }
+
+        $this->head = $slowPtr;
+        return;
+    }
+
+    public function reverseLL($head, $prev = null){
+
+        // $this->head = $head;
+        // if($this->head == null || $this->head->next == null) return $this->head;
+        // $currentNode = $this->head; $prev = null;
+        // while($currentNode != null){
+        //     $nextNode = $currentNode->next;
+        //     $currentNode->next = $prev;
+        //     $prev = $currentNode;
+        //     $currentNode = $nextNode;
+        // }
+        // $this->head = $prev;
+        // return $this->head;
+
+        //Recursive Approch
+        if($head == null) return $prev;
+      
+        $currentNode = $this->head = $head;
+        $nextNode = $currentNode->next;
+        $currentNode->next = $prev;
+
+        $prev = $currentNode;
+        $this->head = $prev;
+        
+        $this->reverseLL($nextNode, $prev);
+    }
+
+    public function hasCycle($head){
+        //hash map approch if repeat element  found then it is a loop 
+        //OR
+        //Tortoise and Hare Algorithm approch
+        //spl_object_hash =>point to This function returns a unique identifier for the object
+        $slowPtr = $head;
+        $fastPtr = $head;
+        if($fastPtr == null || $fastPtr->next == null) return false;
+
+        while($fastPtr != null && $fastPtr->next != null){
+            $slowPtr = $slowPtr->next;
+            $fastPtr = $fastPtr->next->next;
+            if($fastPtr != null && spl_object_hash($slowPtr) ==  spl_object_hash($fastPtr)) { 
+                return true;
+            }
+        }
+        return false;
+
+        //Getting some issue above solution like Line 26: PHP Fatal error:  Nesting level too deep - recursive dependency? in solution.php
+        //So using hasp map approch   
+        // $visited = [];
+        // $current = $head;
+        // while ($current !== null) {
+        //     $hash = spl_object_hash($current);
+        //     if (isset($visited[$hash])) {
+        //         return true;
+        //     }
+        //     $visited[$hash] = true;
+        //     $current = $current->next;
+        // }
+        // return false;
+    }
+
+
+    function detectCycle($head) {
+        //S(N) approch
+        // $visited = [];
+        // $current = $head;
+        // $index = 0;
+        // while ($current !== null) {
+        //     $hash = spl_object_hash($current);
+        //     if (isset($visited[$hash])) {
+        //         return $current;
+        //     }
+        //     $visited[$hash] = $index; 
+        //     $index++;
+        //     $current = $current->next;
+        // }
+        // return null;
+
+        $slowPtr = $fastPtr = $head;
+        if($fastPtr == null && $fastPtr->next == null) return null;
+        while ($fastPtr != null && $fastPtr->next != null){
+            //head 1 to slowptr distance where slowptr 3 at circle start node distance = l = distance of (slowptr 3 - fast 5)
+            //fast to slow other side disctance D 5-->3
+            //total circle distance l+D
+            //fast cover distance to reach slow is  2D then slow cover D distance 
+            //then remaining distance to reach start Node circle is L bcz total circle distance l+D=L+2D so L=D
+            //so fast will meet slow after  2*D times.
+            //And we know that if start from head and cover L distance then reach start node of circle
+            $slowPtr = $slowPtr->next;
+            $fastPtr = $fastPtr->next->next;
+            if($fastPtr != null && spl_object_hash($slowPtr) ==  spl_object_hash($fastPtr)) { 
+                $slowPtr = $head; 
+                while(spl_object_hash($slowPtr) !=  spl_object_hash($fastPtr)) { 
+                    $slowPtr = $slowPtr->next;
+                    $fastPtr = $fastPtr->next;
+                }
+                return $slowPtr;
+            }
+        }
+        return null;
+
+        //To find cycle  length, then use hashmap and every node store as key and counter as value counter value will be increment by one
+        //if hash value exits thne after increment of currentcounter - hashvalue , return value will be answer
+
+        //other approch  use extra space, not allowed then just after getting collide point of slow and fast
+        //and after just make fastptr move to one step and counter increase by one then it will meet again to slow then return counter is aswer 
+    }
+
+    function isPalindrome($head) {
+        $str = "";
+        if($head == null || $head->next == null) return true;
+        $current  = $head;
+        $prev = null;
+        while($current != null) {
+            $str .=	$current->data;
+            $next = $current->next;
+            $current->next = $prev;
+            $prev = $current;
+            $current = $next;
+        }
+
+        $str1 = "";
+        $head = $prev;
+        $current  = $head;
+        while($current != null) {
+            $str1 .=	$current->data;
+            $current = $current->next;
+        }
+        if($str1 == $str){
+            return true;
+        }
+        return false;
+    }
 }
 
 $linkListObj = new linkedList();
 $linkListObj->insertNodeAtEnd("1");
 $linkListObj->insertNodeAtEnd("2"); 
-$linkListObj->insertNodeAtEnd("3");
-$linkListObj->insertNodeAtEnd("4");
-$linkListObj->insertNodeAtEnd("5");
-//$linkListObj->insertNodeAtHead("4");
+// $linkListObj->insertNodeAtEnd("3");
+// $linkListObj->insertNodeAtEnd("2");
+// $linkListObj->insertNodeAtEnd("2");
+// $linkListObj->insertNodeAtEnd("1");
+//$linkListObj->insertNodeAtEnd1("1", 0);
+//print_r($linkListObj->head);
+var_dump($linkListObj->isPalindrome($linkListObj->head));
+
+// $linkListObj->insertNodeAtEnd("7");
+// $linkListObj->insertNodeAtEnd("8");
+// $linkListObj->insertNodeAtEnd("6");
 //$linkListObj->deleteHead();
 //$linkListObj->deleteLastNode();
 //$linkListObj->deleteKValueElement("4");
-$linkListObj->traverse();
+//$linkListObj->traverse();
 
-$linkListObj->insertNodeAtElementVal('40', '4');
+//$linkListObj->reverseLL($linkListObj->head);
 // $linkListObj->insertNodeAtKthElement('178', '2');
 // $linkListObj->insertNodeAtKthElement('1', '1');
 // $linkListObj->insertNodeAtKthElement('1781', '3');
 
 
 
-$linkListObj->traverse();
+//$linkListObj->traverse();
 
 
 //$linkListObj->deleteKthNode(4);
