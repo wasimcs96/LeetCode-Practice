@@ -135,7 +135,7 @@ class linkedList{
                 $currentNode->next = $temp;
                 $currentNode = $temp;
             }
-            $this->traverse();
+            //$this->traverse();
         }
     }
 
@@ -386,42 +386,361 @@ class linkedList{
     }
 
     function isPalindrome($head) {
-        $str = "";
+        // $str = "";
+        // if($head == null || $head->next == null) return true;
+        // $current  = $head;
+        // $prev = null;
+        // while($current != null) {
+        //     $str .=	$current->data;
+        //     $next = $current->next;
+        //     $current->next = $prev;
+        //     $prev = $current;
+        //     $current = $next;
+        // }
+
+        // $str1 = "";
+        // $head = $prev;
+        // $current  = $head;
+        // while($current != null) {
+        //     $str1 .=	$current->data;
+        //     $current = $current->next;
+        // }
+        // if($str1 == $str){
+        //     return true;
+        // }
+        // return false;
+        //make a stack and perform push and pop opration at last if stack is empay then retur true
+
+        //compare half - half LL
+        //get mid point and make second half reverse and compare with first half
+
         if($head == null || $head->next == null) return true;
-        $current  = $head;
-        $prev = null;
+        $slowPtr = $fastPtr = $head;
+
+        while($fastPtr != null || $fastPtr->next != null){ //at this condition slowPt will be lie at midpoint of LL
+            $slowPtr = $slowPtr -> next;
+            $fastPtr = $fastPtr->next->next;
+        }
+        //reverse second half LL
+        $pre = null;
+        $current = $slowPtr;
         while($current != null) {
-            $str .=	$current->data;
             $next = $current->next;
-            $current->next = $prev;
-            $prev = $current;
+            $current->next = $pre;
+            $pre = $current;
             $current = $next;
         }
 
-        $str1 = "";
-        $head = $prev;
-        $current  = $head;
-        while($current != null) {
-            $str1 .=	$current->data;
-            $current = $current->next;
+        $preHead = $pre;
+        while($preHead != null && $head != null ){
+            if($preHead->data != $head->data) return false;
+            $preHead = $preHead->next;
+            $head = $head->next;
         }
-        if($str1 == $str){
-            return true;
-        }
-        return false;
+        return true;
     }
+
+    function removeNthFromEnd($head, $n) {
+        //find length and get nth node from Head and deleete it
+        //O(2L) approch
+        // $getlength = $this->getlengthLL($head);
+        // if ($getlength < $n) return $head;
+        // if(($head == null || $head->next == null) && $n == 1) return $this->head = null;
+        // $deleteAfterNthNode =  $getlength - $n;
+        // if($deleteAfterNthNode == 0) {
+        //     $this->head = $head->next; 
+        //     return;
+        // }
+        // //echo $deleteAfterNthNode;
+        // $counter = 1;
+        // $currentNode = $head;
+        // while($counter < $deleteAfterNthNode){
+        //     $counter++;
+        //     $currentNode = $currentNode->next;
+        // }
+        // $deletedNode = $currentNode->next;
+        // $currentNode->next = $currentNode->next->next;
+        // unset($deletedNode);
+        // return $head;
+
+        //O(L) approch
+        //Maintain two pointers and update one with a delay of n steps.
+
+        if(($head == null || $head->next == null) && $n == 1) return $this->head = null;
+        $slowPtr = $head; $fastPtr = $head;
+        for($i = 0; $i < $n; $i++){
+            $fastPtr = $fastPtr->next;
+        }
+        if($fastPtr == null) return $head->next;
+        while($fastPtr->next != null){
+            $fastPtr = $fastPtr->next;
+            $slowPtr = $slowPtr->next;
+        }
+        
+        $deletedNode =  $slowPtr->next;
+        $slowPtr->next = $slowPtr->next->next;
+        
+        unset($deletedNode);
+        return $this->head;
+    }
+
+    function deleteMiddle($head) {
+        if($head == null || $head->next == null) return $head;
+        if($head->next->next == null) return $head->next = null;
+        $slowPtr = $fastPtr = $head;
+        $fastPtr = $fastPtr->next->next;
+        while($fastPtr != null && $fastPtr->next != null) {
+            $fastPtr = $fastPtr->next->next;
+            $slowPtr = $slowPtr->next;
+        }
+        echo $slowPtr->data."->"; 
+        //$slowPtr->data = $slowPtr->next->data;
+        $slowPtr->next = $slowPtr->next->next;
+        return $head;
+        
+    }
+
+    //Sort a Linked list
+    function mergeSortedLists($l1,  $l2) {
+        $head1 = $l1;
+        $head2 =  $l2;
+        $dummy = new Node('-1');
+        $curr = $dummy;
+        while($head1 != null && $head2 != null) {
+            if($head1->data <=  $head2->data) {
+                $curr->next = $head1;
+                $head1 = $head1->next;
+            } else {
+                $curr->next = $head2;
+                $head2 = $head2->next;
+            }
+            $curr = $curr->next;
+        }
+        /* If any node is remaining then add it to the end */
+        if ($head1 != null) $curr->next = $head1;
+        else $curr->next = $head2;
+    
+        //echo $dummy->next->data. "\n";
+        return $dummy->next;
+    }
+
+    function getMiddleOfLL($head){
+        if($head == null) return null;
+        $slowPtr = $head;
+        $fastPtr = $head;
+        while($fastPtr->next != null && $fastPtr->next->next != null) {
+            $slowPtr = $slowPtr->next;
+            $fastPtr = $fastPtr->next->next;
+        }
+        return $slowPtr;
+    }
+    function sortList($head) {
+        if($head == null  || $head->next == null) return $head;
+        //find middle
+        $middleNode = $this->getMiddleOfLL($head);
+        $headOfMiddle = $middleNode->next;
+        $middleNode->next = null;
+        //recursively sort two halves
+        $head1 = self::sortList($head);
+        $head12 = self::sortList($headOfMiddle);
+        //merge sorted lists
+        $sortedList = $this->mergeSortedLists($head1, $head12);
+        return $sortedList;
+    }
+
+    //Sort a LL of 0's 1's and 2's by changing link
+    function sortOfLLValues($head){
+        if($head == null || $head->next == null) return $head;
+
+        $currentNode = $head;
+
+        $h1  = new Node(-1);
+        $h2 = new Node(-1);
+        $h3 = new Node(-1);
+
+        $c1 = $h1; 
+        $c2 = $h2; 
+        $c3 = $h3;
+      
+        while($currentNode != null){
+            $currentData =  $currentNode->data; 
+            if($currentData == 0){
+                    $c1->next = $currentNode;
+                    $c1 = $c1->next;
+            }
+            else if($currentData == 1){
+                $c2->next = $currentNode;
+                $c2 = $c2->next;
+                
+            }
+            else{
+                $c3->next = $currentNode;
+                $c3 = $c3->next;
+            }
+            $currentNode = $currentNode->next;
+        }
+       
+        $c1->next = ($h2->next) ? $h2->next : $h3->next;  
+        $c2->next = ($h3->next) ? $h3->next : null;  
+        $c3->next = null;
+        $this->head = $h1->next;  
+    }
+
+    //arrrange first all Odd number then even numbers
+    //1,3,5,2,4,6,8
+    function oddEvenList($head){
+        if($head == null || $head->next == null) return $head;
+
+        $currentNode = $head;
+
+        $oddHead  = new Node(-1);
+        $evenHead = new Node(-1);
+       
+        $odd = $oddHead; 
+        $even = $evenHead; 
+      
+        while($currentNode != null){
+            $numberIsEven =  (( $currentNode->data % 2) == 0) ? true  : false ; 
+            if($numberIsEven){
+                $even->next = $currentNode;
+                $even = $even->next;
+            }
+            else{ 
+                $odd->next = $currentNode;
+                $odd = $odd->next;
+            }
+            $currentNode = $currentNode->next;
+            
+        }
+       
+        $odd->next = ($evenHead->next) ? $evenHead->next : null;  
+        $even->next =  null;  
+        $this->head = $oddHead->next;  
+    }
+
+    //Arrange first Odd index Node then even index nodes
+    //1,3,5,2,4,6,8
+    function oddEvenIndexList($head){
+        // if($head == null || $head->next == null) return $head;
+
+        // $currentNode = $head;
+
+        // $oddHead  = new Node(-1);
+        // $evenHead = new Node(-1);
+       
+        // $odd = $oddHead; 
+        // $even = $evenHead; 
+        // $countIndex = 1;
+        // while($currentNode != null){
+        //     $numberIsEven =  (($countIndex % 2) == 0) ? true  : false ; 
+        //     if($numberIsEven){
+        //         $even->next = $currentNode;
+        //         $even = $even->next;
+        //     }
+        //     else{ 
+        //         $odd->next = $currentNode;
+        //         $odd = $odd->next;
+        //     }
+        //     $currentNode = $currentNode->next;
+        //     $countIndex++;
+        // }
+       
+        // $odd->next = ($evenHead->next) ? $evenHead->next : null;  
+        // $even->next =  null;  
+        // $this->head = $oddHead->next;  
+
+        //Second Approch
+        if($head == null || $head->next == null) return $head;
+        $odd = $head;
+        $even = $head->next;
+        $evenHead = $head->next;
+        while($odd->next != null && $even->next != null){
+            $odd->next = $even->next;
+            $even->next = $odd->next->next;
+            $odd = $odd->next;
+            $even = $even->next;
+        }
+        $odd->next = $evenHead;
+        return $head;
+    }
+
+    function getIntersectionNode($headA, $headB) {
+        if($headA == null || $headB == null) return null;
+
+        $lenA = 0; //7
+        $nodeA = $headA;
+        while($nodeA != null) {
+          $nodeA = $nodeA->next;
+          $lenA++;
+        }
+
+        $lenB = 0; //5
+        $nodeB = $headB;
+        while($nodeB != null) {
+          $nodeB = $nodeB->next;
+          $lenB++;
+        }
+
+        $nodeA = $headA;
+        $nodeB = $headB;
+        if($lenA > $lenB){ //7-5 = 2 si higher length LL will be skip 2 steps then compare with another LL nodes
+            $diff = $lenA-$lenB;
+            while($diff){
+                $diff--;
+                $nodeA = $nodeA->next;
+            }
+        }else if($lenA < $lenB){
+            $diff = $lenB-$lenA;
+            while($diff){
+                $diff--;
+                $nodeB = $nodeB->next;
+            }
+        }
+        while($nodeA != null && $nodeB != null){
+            if(spl_object_hash($nodeA) == spl_object_hash($nodeB)){
+                return $nodeA;
+            }else{
+                $nodeA = $nodeA->next;
+                $nodeB = $nodeB->next;
+            }
+        }
+        return null;
+        
+    }
+
+
 }
 
 $linkListObj = new linkedList();
 $linkListObj->insertNodeAtEnd("1");
 $linkListObj->insertNodeAtEnd("2"); 
-// $linkListObj->insertNodeAtEnd("3");
-// $linkListObj->insertNodeAtEnd("2");
-// $linkListObj->insertNodeAtEnd("2");
-// $linkListObj->insertNodeAtEnd("1");
+$linkListObj->insertNodeAtEnd("3");
+$linkListObj->insertNodeAtEnd("4");
+// $linkListObj->insertNodeAtEnd("5"); 
+// $linkListObj->insertNodeAtEnd("6");
+// $linkListObj->insertNodeAtEnd("7");
+// $linkListObj->insertNodeAtEnd("8");
+// $linkListObj->insertNodeAtEnd("9");
+// $linkListObj->insertNodeAtEnd("10");
+// $linkListObj->insertNodeAtEnd("11");
+$linkListObj1 = new linkedList();
+$linkListObj1->insertNodeAtEnd("8");
+$linkListObj1->insertNodeAtEnd("9");
+$linkListObj1->insertNodeAtEnd("3");
+$linkListObj->insertNodeAtEnd("11");
+// $linkListObj1->mergeSortedLists($linkListObj->head, $linkListObj1->head);
+
+//$linkListObj->head = $linkListObj->sortList($linkListObj->head);
+// $linkListObj->sortOfLLValues($linkListObj->head);
+$linkListObj->convertArrToLL([2,1,3,5,6,4,7]);
+$linkListObj->head = $linkListObj->oddEvenIndexList($linkListObj->head);
+
+
+
+$linkListObj->traverse();
 //$linkListObj->insertNodeAtEnd1("1", 0);
 //print_r($linkListObj->head);
-var_dump($linkListObj->isPalindrome($linkListObj->head));
+//var_dump($linkListObj->isPalindrome($linkListObj->head));
 
 // $linkListObj->insertNodeAtEnd("7");
 // $linkListObj->insertNodeAtEnd("8");
@@ -438,7 +757,7 @@ var_dump($linkListObj->isPalindrome($linkListObj->head));
 
 
 
-//$linkListObj->traverse();
+
 
 
 //$linkListObj->deleteKthNode(4);
