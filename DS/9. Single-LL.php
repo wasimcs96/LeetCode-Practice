@@ -708,14 +708,99 @@ class linkedList{
         
     }
 
+    function addOneNumberToLL($num, &$llHead) {
+        if($this->head == null) {
+            $this->head = new Node($num);
+        }else{
+            $this->reverseLL($this->head);
+            
+            $currentNode = $this->head;
+            $carry = $num;
+            while($currentNode != null){
+                $currentNode->data += $carry;
+                if($currentNode->data >= 10) {
+                    $currentNode->data = 0;
+                    $carry = 1;
+                }else{
+                    $carry = 0;
+                }
+                if($currentNode->next == null){
+                    if($carry == 1){
+                        $currentNode->next = new Node(1);
+                    }
+                    break;
+                }
+                //echo $currentNode->data . "\n";
+                $currentNode = $currentNode->next;
+                
+            }
 
+            $this->reverseLL($this->head);
+        }
+    }
+    //Recirsive Approch
+    function addOneNumberToLLRecursiveApproch($num){
+       $carry =  $this->addOneNumberToLLRecursive($num, $this->head);
+       if($carry != 0){
+            $newNode = new Node($carry);
+            $newNode->next = $this->head;
+            $this->head = $newNode;
+       }
+    }
+    function addOneNumberToLLRecursive($num, $node, $carry=0) {
+        if($node == null){
+            return 1;
+        }
+        $currentNode = $node;
+        $carry = $this->addOneNumberToLLRecursive($num, $currentNode->next, $carry);
+        $currentNode->data += $carry;
+        if($currentNode->data < 10){
+            return 0;
+        }else{
+            $data = $currentNode->data%10;
+            $carry = (int) (($currentNode->data)/10);
+            $currentNode->data = $data;
+            return $carry;
+        }
+    }
+
+    function addTwoNumbers($l1, $l2) {
+        $dummy = new Node(-1);
+        $curr = $dummy;
+        $carry = 0;
+        while($l1||$l2||$carry){
+            $sum = ($l1?$l1->data:0) + ($l2?$l2->data:0) + $carry;
+            if($sum < 10){
+                $carry = 0;
+            }else{
+                $carry = 1;
+                $sum = $sum%10;
+            }
+            $newNode = new Node($sum);
+            $curr->next = $newNode;
+            $curr = $newNode;
+
+            $l1 = $l1 ? $l1->next : $l1;
+            $l2 = $l2 ? $l2->next : $l2;
+        }
+
+        // if($carry == 1){
+        //     $newNode = new Node($carry);
+        //     $curr->next = $newNode;
+        // }
+        return $dummy->next;
+    }
 }
 
 $linkListObj = new linkedList();
-$linkListObj->insertNodeAtEnd("1");
-$linkListObj->insertNodeAtEnd("2"); 
-$linkListObj->insertNodeAtEnd("3");
-$linkListObj->insertNodeAtEnd("4");
+$linkListObj->insertNodeAtEnd(9);
+$linkListObj->insertNodeAtEnd(9); 
+$linkListObj->insertNodeAtEnd(9);
+//$linkListObj->insertNodeAtEnd(9);
+//$linkListObj->insertNodeAtEnd(9);
+// $linkListObj->addOneNumberToLL(1, $linkListObj->head);
+//$linkListObj->addOneNumberToLLRecursiveApproch(1, $linkListObj->head);
+
 // $linkListObj->insertNodeAtEnd("5"); 
 // $linkListObj->insertNodeAtEnd("6");
 // $linkListObj->insertNodeAtEnd("7");
@@ -724,16 +809,17 @@ $linkListObj->insertNodeAtEnd("4");
 // $linkListObj->insertNodeAtEnd("10");
 // $linkListObj->insertNodeAtEnd("11");
 $linkListObj1 = new linkedList();
-$linkListObj1->insertNodeAtEnd("8");
-$linkListObj1->insertNodeAtEnd("9");
-$linkListObj1->insertNodeAtEnd("3");
-$linkListObj->insertNodeAtEnd("11");
+$linkListObj1->insertNodeAtEnd(1);
+$linkListObj1->insertNodeAtEnd(0);
+$linkListObj1->insertNodeAtEnd(0);
+$linkListObj->head = $linkListObj1->addTwoNumbers($linkListObj->head, $linkListObj1->head);
+
 // $linkListObj1->mergeSortedLists($linkListObj->head, $linkListObj1->head);
 
 //$linkListObj->head = $linkListObj->sortList($linkListObj->head);
 // $linkListObj->sortOfLLValues($linkListObj->head);
-$linkListObj->convertArrToLL([2,1,3,5,6,4,7]);
-$linkListObj->head = $linkListObj->oddEvenIndexList($linkListObj->head);
+//$linkListObj->convertArrToLL([2,1,3,5,6,4,7]);
+//$linkListObj->head = $linkListObj->oddEvenIndexList($linkListObj->head);
 
 
 

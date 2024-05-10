@@ -33,9 +33,9 @@ class Node {
     public function setNext($next) {
 
         // Avoid creating a loop in the linked list.
-        if ($next != null && $next instanceof Node && $next->getData() === $this->getData()) {
-            throw new Exception('Linked nodes cannot  have themselves as next');
-        } 
+        // if ($next != null && $next instanceof Node && $next->getData() === $this->getData()) {
+        //     throw new Exception('Linked nodes cannot  have themselves as next');
+        // } 
         $this->next = $next;    
     }  
         
@@ -446,11 +446,127 @@ class DLL{
         }
         return;
     }
+    //Delete all occurrences of a given key in a doubly linked list
+    public function deleteAllKey($key){
+        $currentNode = $this->head;
+        while($currentNode != null){
+            if($currentNode->data == $key){
+                $prev = $currentNode->prev;
+                $next = $currentNode->next;
+                if($prev != null) $prev->next = $next;
+                if($next != null) $next->prev = $prev; //if next is not null
+                if($currentNode == $this->head) $this->head = $next;   //If head is to be deleted then point
+            }
+            $currentNode = $currentNode->next;  //Move to next node
+        }
+        return;
+    }
+    //Find pairs with given sum in Sorted doubly linked list
+    public function findPairsWithSum($sum){
+        //S(N) but O(N)
+        // $result = array();
+        // $map = array();
+        // $curr = $this->head;
+        // while($curr != null){
+        //     $data = $curr->data;
+        //     if(isset($map[$data])){
+        //         array_push($result, array($map[$data], $data));
+        //         unset($map[$data]);
+        //     }else{
+        //         $diff = $sum - $curr->data;
+        //         $map[$diff] = $curr->data;
+        //     }
+        //     $curr = $curr->next;
+        // }
+        // return $result;
+
+        //S(N) but O(N)
+        // $result = array(); 
+        // $map = array();
+        // $curr = $this->head;
+        // while ($curr != null) {
+        //     $diff = $sum - $curr->data;
+        //     if (isset($map[$diff])) {
+        //         array_push($result, array("x" => $curr->data, "y" => $diff));
+        //     }
+        //     $map[$curr->data] = true;
+        //     $curr = $curr->next;
+        // }
+        // return $result;
+
+        // S(1) but O(N^2)
+        // $result = array();
+        // $curr = $this->head;
+        // $low = $curr;
+        // $high = $curr->next;
+        // while($low != null && $high !=null){
+        //     $hightmp = $hightmp = $high;;
+        //     while($hightmp != null && $sum  >= $low->data + $hightmp->data){
+        //         if($low->data + $hightmp->data == $sum)
+        //              array_push($result, array('x' => $low->data , 'y' => $hightmp->data));
+
+        //         $hightmp = $hightmp->next;
+        //     }
+        //     $low = $low->next;
+        //     if($high !=null) $high = $high->next;
+        // }
+        // return $result;
+
+        //if sorted DLL S(1) but O(N)
+        //remebr if sorted then get random number sum use low and high pont always in array and LL also
+        $result = array();
+        $curr = $this->head;
+        $low = $curr;
+
+        while($curr->next != null){
+            $curr = $curr->next;
+        }
+        $high = $curr;
+
+        while($low != null && $high !=null && $low->data <= $high->data){
+            $total = $high->data + $low->data;
+            if($sum > $total){
+                $low = $low->next;
+            }else if($sum < $total){
+                $high = $high->prev;
+            }else{
+                array_push($result, array('x' => $low->data , 'y' => $high->data));
+                $high = $high->prev;
+            }
+        }
+        return $result;
+    }
+
+    //Remove duplicates from a sorted doubly linked list
+    public function removeDuplicates(){
+        if($this->head == null) return;
+        $curr = $this->head;
+        $firstOccurrence = $curr;
+        $lastOccurrence = $curr->next;
+        while($lastOccurrence != null){
+            $flag = false;
+            while($lastOccurrence != null && $firstOccurrence->data == $lastOccurrence->data){
+                $lastOccurrence = $lastOccurrence->next;
+                $flag = true;
+                //unset($lastOccurrence->prev);
+            }
+            if($flag){
+                $firstOccurrence->next = $lastOccurrence;
+                if($lastOccurrence !=null) $lastOccurrence->prev = $firstOccurrence;
+            }
+            if($firstOccurrence !=null) $firstOccurrence = $firstOccurrence->next;
+            if($lastOccurrence !=null)  $lastOccurrence = $lastOccurrence->next;
+        }
+        return;
+    }
 }
 
 $dLL = new DLL();
-$testArray = array(1,2,3,4,5);
+$testArray = array(1173,1535,2848,3158,4327,4941,5940,6908,7632,7734,9057,9353,9943,10863,10863,11483,11876,12537,12668,12944,14407,14562,16740,16876,17101,17547,18048,19792,20027,20832,20994,22365,22756,22926,23071,23669,24274,24681,24853,25090,25268,25864,26150,26535,26745,27050,27528,27827,28135,29458,30552,31032,31099,31229,32115,32742,32752,33806,34034,36300,36829,37820,38490,38651,38992,42272,42627,43318,43924,43951,46717,47346,48215,48585,48816,49278,49831,49943,50324,51149,51236,51628,52695,53619,54277,55795,57076,59675,60483,61946,62817,63317,64081,64991,65030,65301,66502,67499,69085,69752,70287,71513,71640,72892,73471,74608,74793,75226,75458,75671,76298,77000,77232,77277,79519,80112,80395,80630,81026,82580,83719,84507,84817,85322,85807,87126,87998,88008,88394,88455,89730,90773,91007,91194,91829,92429,93287,93458,93958,98560,98789,98862,98864,99134,99134);
+$testArray = array(1,1,1,2,3,4);
 $dLL->convertArrToDLL($testArray);
+$dLL->removeDuplicates();
+
 // $dLL->deleteHead();
 // $dLL->deleteHead();
 //$dLL->deleteTail();
@@ -460,15 +576,8 @@ $dLL->convertArrToDLL($testArray);
 //$dLL->addNodeAfterHead(100);
  //$dLL->addNodeAfterTail(7);
 //$dLL->addNodeAftereNodeValue(4.5, 4);
-
-
-
 //echo $dLL->head->data;
-$dLL->reverseNodes();
-
-
-
-
+//$dLL->reverseNodes();
 $dLL->traverse();
 
 
