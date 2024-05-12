@@ -1,71 +1,19 @@
 <?php
-class Node {
-    public $data;
-    public $next;
+$arr = [1,2,3];
+printSub(0, 3, $arr, []);
 
-    public function __construct($data) {
-        $this->data = $data;
-        $this->next = null;
+function printSub($i, $n, $arr, $result){
+
+    if($i >= $n){
+        print_r($result); 
+        return;
     }
+    printSub($i+1, $n, $arr, $result);
+
+    array_push($result, $arr[$i]);
+    printSub($i+1, $n, $arr, $result);
+    
 }
 
-function sortList($head) {
-    if (!$head || !$head->next) {
-        return $head;
-    }
-
-    $zeroD = new Node(0);
-    $oneD = new Node(0);
-    $twoD = new Node(0);
-    $zero = $zeroD;
-    $one = $oneD;
-    $two = $twoD;
-
-    $curr = $head;
-    while ($curr) {
-        if ($curr->data === 0) {
-            $zero->next = $curr;
-            $zero = $zero->next;
-        } elseif ($curr->data === 1) {
-            $one->next = $curr;
-            $one = $one->next;
-        } else {
-            $two->next = $curr;
-            $two = $two->next;
-        }
-        $curr = $curr->next;
-    }
-
-    $zero->next = $oneD->next ?: $twoD->next;
-    $one->next = $twoD->next;
-    $two->next = null;
-
-    // Updated head
-    $head = $zeroD->next;
-
-    return $head;
-}
-
-// Helper function to print linked list
-function printList($node) {
-    while ($node !== null) {
-        echo $node->data . " ";
-        $node = $node->next;
-    }
-    echo "\n";
-}
-
-// Example usage
-$head = new Node(1);
-$head->next = new Node(2);
-$head->next->next = new Node(0);
-$head->next->next->next = new Node(1);
-
-echo "Linked List Before Sorting:\n";
-printList($head);
-
-$head = sortList($head);
-
-echo "Linked List After Sorting:\n";
-printList($head);
 ?>
+              
