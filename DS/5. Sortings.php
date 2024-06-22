@@ -179,5 +179,54 @@ function mergSort(&$array, $l, $r){
  //TC = n/2+n/4+n/6.....= logn  => O(N * log2N). //All case
  //SC = Constant S(N)
 
+ //Recuirsive Approch
+ $arr = [6,2,4,9,2,1,6,44,22,77,99,112,666,43];
+ mergeSort($arr, 0, count($arr)-1);
+ print_r($arr);
+ function mergeSort(&$arr, $left, $right ){
+     if($left >= $right) return;
+ 
+     //devide
+     $mid = (int)($left+$right)/2;
+     $mid = (int) $mid;
+ 
+     mergeSort($arr, $left, $mid);
+     mergeSort($arr,$mid+1, $right);
+     
+     //merge
+     
+     mergeSortedArr($arr, $left, $mid, $right);
+ }
+ 
+ function mergeSortedArr(&$arr,$l,$mid,$r){
+     echo "$l , $mid , $r \n";
+     $left = $l;//left->mid   => 2 -> 4
+      $right = $mid+1;   //right->r    => 5 -> 6 
+      $temp = []; //will store 5 items
+      while($left <= $mid && $right <= $r){
+          if($arr[$left] <= $arr[$right]){ //check 2 and 5 index
+              $temp[] = $arr[$left];
+              $left++;
+          }else{
+              $temp[] = $arr[$right];
+              $right++;
+          }
+      }
+      while($left <= $mid ){//remianging left to mid
+          $temp[] = $arr[$left];
+          $left++;
+      }
+  
+      while($right <= $r){//remianging right to r
+          $temp[] = $arr[$right];
+          $right++;
+      }
+  
+      print_r($temp);
+      for($i=$l; $i<=$r; $i++){
+          $arr[$i] = $temp[$i-$l];
+      }
+}
+
 
 ?>
