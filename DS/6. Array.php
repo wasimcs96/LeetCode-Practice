@@ -95,9 +95,9 @@ function rotate(&$nums, $k) {
   if($k > 0){
     if($k > $length) $k=$k%$length;  //14=>4 if length is 10
     $n = count($nums)-1;
-    $this->reverse($nums, $n-$k+1, $n); // 7 to 10 reverse => 10,9,8,7
-    $this->reverse($nums, 0, $n-$k); // 1to 6 reverse => 6,5,4,3,2,1
-    $this->reverse($nums, 0, $n); //complete reverse => 6,5,4,3,2,1,10,9,8,7 => 7,8,9,10,1,2,3,4,5,6
+    reverse($nums, $n-$k+1, $n); // 7 to 10 reverse => 10,9,8,7
+    reverse($nums, 0, $n-$k); // 1to 6 reverse => 6,5,4,3,2,1
+    reverse($nums, 0, $n); //complete reverse => 6,5,4,3,2,1,10,9,8,7 => 7,8,9,10,1,2,3,4,5,6
   }
 }
 
@@ -107,6 +107,95 @@ function reverse(&$nums, $st, $ed){
     $st++;
     $ed--;
   }
+}
+//Move Zeros to end
+function moveZeroes(&$nums) {
+  $i = 0;
+  for ($j = 0; $j < count($nums); $j++) {
+    if ($nums[$j] != 0) { //logic
+      list($nums[$j], $nums[$i]) = [$nums[$i], $nums[$j]];
+      $i++;
+    }
+  }
+}
+
+//find the Unioun
+$arr1 = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+$arr2 = [2, 3, 4, 4, 5, 11, 12];
+$uni = [];
+
+$count1 = count($arr1)-1;
+$count2 = count($arr2)-1;
+
+$i=$j=0;
+
+while($i <= $count1 && $j<=$count2){
+  if($arr1[$i] < $arr2[$j]){
+    $uni[$arr1[$i]] = $arr1[$i];
+    $i++;
+  }else if($arr1[$i] > $arr2[$j]){
+    $uni[$arr2[$j]] = $arr2[$j];
+    $j++;
+  }else{
+    $uni[$arr2[$j]] = $arr2[$j];
+    $i++;
+    $j++;
+  }
+}
+
+while($i <= $count1){
+  $uni[$arr1[$i]] = $arr1[$i];
+  $i++;
+}
+
+while($j<=$count2){
+  $uni[$arr2[$j]] = $arr2[$j];
+    $j++;
+}
+
+print_r($uni);
+
+//268. Missing Numbe
+function missingNumber($nums) {
+  sort($nums); //using sort in O(n)
+
+  $length = count($nums);
+  for($i=0;$i<$length;$i++){
+    if($nums[$i] != $i) break;
+  }
+
+  return $i;
+
+  //sum of n ((N * (N+1))/2 ) and minus arr[i] from sum of array and end of loop sum will give missing value
+}
+
+//485. Max Consecutive Ones
+function findMaxConsecutiveOnes($nums) {
+        
+  $max = 0;
+  $length = count($nums)-1;
+  $tempCount = 0;
+  for($i=0;$i<=$length;$i++){
+    if($nums[$i] == 1){
+      $tempCount++;
+    }else{
+      $tempCount = 0;
+    }
+    $max = max($max, $tempCount);
+  }
+  return $max;
+}
+
+//136. Single Number
+function singleNumber($nums) {
+  $count=count($nums);
+  $ans = 0;
+  if($count == 1) return $nums[0];
+  
+  for($i=0;$i<$count;$i++){
+     $ans ^= $nums[$i];
+  }
+  return $ans;
 }
 
 
