@@ -114,18 +114,18 @@ echo isPrime(227);
     //lcm(a,b) * gcd(a,b) = a*b
 
 
-    function findGCD($a, $b){
-        if ($a == 0 || $b==0 ) {
-            return $a==0?$b:$a;
-        }
-        $gcd = "";
-        for($i=1;$i<=min($a, $b);$i++){ //GCD will never greater then min value among params
-            if(($a%$i == 0) && ($b%$i == 0)){
-                $gcd = $i;
-            }
-        }
-        return $gcd;
+function findGCD($a, $b){
+    if ($a == 0 || $b==0 ) {
+        return $a==0?$b:$a;
     }
+    $gcd = "";
+    for($i=1;$i<=min($a, $b);$i++){ //GCD will never greater then min value among params
+        if(($a%$i == 0) && ($b%$i == 0)){
+            $gcd = $i;
+        }
+    }
+    return $gcd;
+}
 
 
     

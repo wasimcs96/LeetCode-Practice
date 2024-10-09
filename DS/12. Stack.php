@@ -61,7 +61,6 @@ class implementStackWithArray{
         return $this->stackObj->getStack();
     }
 }
-
 // $arr = [1,2,3,111,3,66,7];
 // $stack = new Stack(10);
 // $stackWithArray = new implementStackWithArray($arr, $stack);
@@ -312,4 +311,54 @@ class MinStack {
     public function getMin() {
         return $this->mini;
     }
+}
+
+
+//Infix To PostFix
+$infix = 'a+b*(c^d-e)^(f+g*h)-i';
+echo infixToPostfix($infix);
+function infixToPostfix($infix){
+    $stack = []; $top = -1;
+    $postfix = '';
+    for($i=0;$i<strlen($infix);$i++){
+      $suffix = $infix[$i];
+      if(($suffix >= 'A' && $suffix <= 'Z') || ($suffix >= 'a' && $suffix <= 'z') || ($suffix >= '0' && $suffix <= '9')){
+        $postfix .= $suffix;
+      }else if($suffix == '('){
+        array_push($stack, $suffix);
+        $top++;
+      }else if($suffix == ')'){
+        while(count($stack) > 0 && $stack[$top] != '('){
+          $postfix .= $stack[$top];
+          array_pop($stack);
+          $top--;
+        }
+        array_pop($stack);
+        $top--;
+      }else{
+        while(count($stack) > 0 && precedence($suffix) <= precedence($stack[$top])){
+          $postfix .= array_pop($stack);
+          $top--;
+        }
+        array_push($stack, $suffix);
+        $top++;
+      }
+    }
+    while($top >= 0){
+      $postfix .= array_pop($stack);
+      $top--;
+    }
+    return $postfix;
+}
+
+function precedence($oprator){
+  if($oprator == '^'){
+    return 3;
+  }elseif($oprator == '*' || $oprator == '/'){
+    return 2;
+  }elseif($oprator == '+' || $oprator == '-'){
+    return 1;
+  }else{
+    return -1;
+  }
 }

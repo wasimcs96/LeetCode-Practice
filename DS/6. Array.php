@@ -1,5 +1,6 @@
 <?php
 //Max And Min in Array
+
 $nums = [10,12,5,3,7,8];
 
 $max = PHP_INT_MIN;
@@ -201,7 +202,7 @@ function singleNumber($nums) {
 
 //***
 //Longest sub-array having sum k
-
+https://leetcode.com/problems/subarray-sum-equals-k/
 $k=15;
 $nums = [10, 5, 2, 7, 1, 9 ];
 $hash = [];

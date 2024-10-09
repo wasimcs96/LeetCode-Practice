@@ -109,7 +109,7 @@ function insertionnSort(&$array, $i , $n){
     if($i == $n) return;
      $j=$i;
      while($j>0 && $array[$j-1] > $array[$j]){ //for best case it will not run
-        list($arr[$j], $arr[$j-1]) = [$arr[$j-1], $arr[$j]];
+        list($array[$j], $array[$j-1]) = [$array[$j-1], $array[$j]];
          $j--;
      }
 
