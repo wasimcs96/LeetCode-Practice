@@ -1,20 +1,27 @@
 <?php 
 
-$arr =[3,1,-2,-5,2,-4]; 
-$i = 0; $p=0;$n=1;
-$k = count($arr)-1;
-$ans = [];
+$n=780; $counter = [];
 
-while($i <= $k){
-   if($arr[$i] > 0){
-      $ans[$p] = $arr[$i];
-      $p+=2;
-   }else{
-      $ans[$n] = $arr[$i];
-      $n+=2;
-   }
-   $i++;
-
+for($i=2; $i<=sqrt($n); $i++){
+  echo "n". "-". $n;
+  echo " ::i". "-". $i. "\n";
+  if($n % $i == 0){
+      //echo $i. "-";
+      $counter[] = $i;
+      while($n%$i == 0){
+          $n = $n/$i;
+          echo "Inner loop : ";
+          echo "n". "-". $n;
+          echo " ::i". "-". $i. "\n";
+          //echo $n/$i. "\n";
+      }
+  }
+  echo "After a itiration : sqrt(n) is ". sqrt($n). " and n is ". $n. "\n";
+  echo "for next itiration, condition will be like this : i ($i+1) <= ". sqrt($n). "\n";
 }
-ksort($ans);
-print_r($ans); 
+
+
+
+
+
+

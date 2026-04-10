@@ -294,31 +294,123 @@ while($i<=$n){
 // _333
 // 4444
 
+
+
 $n=4;
 $i=1;
 
 while($i<=$n){
-    $j = 1;
-    while($j<=$n-$i){
-        echo '_';
-        $j++;
-    }
-    $k=0;
-    while($k<$i){
-        $k++;
-        echo $k;
-        
-    }
-    $k--;
-    while($k>0){
-        echo $k;
-        $k--;
-    }
-   
-    echo '<BR>';
-    $i++;
+   $j=1;
+   while($j<=$i){
+      echo $j;
+      $j++;
+   }
+   $l=2*$n-2*$i;
+   while($l){
+      echo '_';
+      $l--;
+   }
+   $k=$i;
+   while($k){
+      echo $k;
+      $k--;
+   }
+   echo "\n";
+   $i++;
+}
+// 1______1
+// 12____21
+// 123__321
+// 12344321
+
+
+$n=5; $i=0;
+while($i<$n){
+   $j=0;
+   while($j<=$i){
+      $isTrue = ($i+$j)%2==0;
+      echo $isTrue ? "1 " : "0 ";
+      $j++;
+   }
+   $i++;
+   echo "\n";
 }
 
+// 1 
+// 0 1 
+// 1 0 1 
+// 0 1 0 1 
+// 1 0 1 0 1 
+
+$n=5;
+$i=1;
+
+while($i<=$n){
+   $j=1;
+   while($j<=$i){
+      echo chr(64+$i);
+      $j++;
+   }
+   echo "\n";
+   $i++;
+}
+
+//  A
+// BB
+// CCC
+// DDDD
+// EEEEE
 
 
+$n=5;
+$i=1;
+
+while($i<=$n){
+  $j=$n-$i;
+  while($j){
+   echo "_";
+   $j--;
+  }
+  $k=0;
+  while($k<$i){
+   echo chr(65+$k);
+   $k++;
+  }
+  $k--;
+  while($k > 0){
+   echo chr(65+$k-1);
+   $k--;
+  }
+   echo "\n";
+   $i++;
+}
+
+// ____A
+// ___ABA
+// __ABCBA
+// _ABCDCBA
+// ABCDEDCBA
+
+
+$n=5;
+$i=0;
+
+$alpha=69;
+while($i<$n){
+  $j = $alpha-$i;
+  $k = $i+1;
+  while($k){
+    echo chr($j);
+    $j++;
+    $k--;
+  }
+  echo "\n";
+  $i++;
+}
+
+// E
+// DE
+// CDE
+// BCDE
+// ABCDE
 ?> 
