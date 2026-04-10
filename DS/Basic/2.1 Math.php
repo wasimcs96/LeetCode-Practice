@@ -187,7 +187,7 @@ function findGCD($a, $b){
     function findGCD($a, $b){
         if($a == 0) return $b;
         echo $a. "-". $b. "\n";
-// 52-10
+// 52-10 
 // 2-10
 // 0-2
 // 2
