@@ -7,7 +7,7 @@ Your task:
 2. Improve and rewrite the code with:
    - Proper formatting and alignment
    - Clean structure and readability
-3. Add detailed comments:
+3. Add detailed comments: 
    - Explain each step clearly
    - Maintain beginner-friendly explanations
    - Follow the commenting style already used in the file
