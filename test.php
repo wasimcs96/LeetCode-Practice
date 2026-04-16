@@ -1,24 +1,19 @@
 <?php 
-
-$n=780; $counter = [];
-
-for($i=2; $i<=sqrt($n); $i++){
-  echo "n". "-". $n;
-  echo " ::i". "-". $i. "\n";
-  if($n % $i == 0){
-      //echo $i. "-";
-      $counter[] = $i;
-      while($n%$i == 0){
-          $n = $n/$i;
-          echo "Inner loop : ";
-          echo "n". "-". $n;
-          echo " ::i". "-". $i. "\n";
-          //echo $n/$i. "\n";
-      }
-  }
-  echo "After a itiration : sqrt(n) is ". sqrt($n). " and n is ". $n. "\n";
-  echo "for next itiration, condition will be like this : i ($i+1) <= ". sqrt($n). "\n";
+   
+   function fibonnic($n, &$memo){
+    if ($n == 0 || $n==1 ) {
+        return $n;
+    }
+    if(isset($memo[$n])){
+        return $memo[$n];
+    }
+    $memo[$n] =   fibonnic($n-1, $memo) + fibonnic($n-2, $memo);
+    return $memo[$n];
 }
+$memo = [];
+echo fibonnic(5, $memo) . "\n\n";
+
+
 
 
 
