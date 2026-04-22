@@ -426,7 +426,7 @@ print_r($arr);
 
 
 // ============================================================
-// PRACTICE PROBLEMS & APPLICATIONS
+// PRACTICE PROBLEMS & APPLICATIONS 
 // ============================================================
 //
 //  EASY
