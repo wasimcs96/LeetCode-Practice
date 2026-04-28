@@ -1,4 +1,14 @@
-<?php//pow()
+<?php
+/**
+ * Advance Recursion
+ * ============================================================
+ * PROBLEM: Implement power function (x^n) and print all subsequences of an array.
+ *
+ * PATTERNS:
+ *  - Divide and Conquer : Break down problems into smaller subproblems
+ *  - Backtracking      : Explore all possibilities for subsequences
+ * ============================================================
+ */
 $x = 2.00000; $n = -2;
 echo pow($x, $n);
 function myPow($x, $n) {
@@ -168,7 +178,7 @@ function printCountSSSumOfKWithSum($i, $n, $arr, $target, $sum, &$count){
 //OR
 echo printCountSSSumOfKWithSum(0, 3, $arr, 3, 0);
 
-function printCountSSSumOfKWithSum($i, $n, $arr, $target, $sum, $map){
+function printCountSSSumOfKWithSumV2($i, $n, $arr, $target, $sum, $map){
     //add this if all arr's element will be positive
     if($target < $sum) return 0;
 
