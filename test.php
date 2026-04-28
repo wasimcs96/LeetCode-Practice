@@ -1,27 +1,22 @@
-<?php 
-$arr = [0, 222,10, 22, 1300, 14, 5, 2222 , -1];
+<?php
+$arr = [-3, 2, 1]; $k = 15;
+$arrLength = count($arr);
+$targetLength = 0; $sum = 0; $i=0;$j=0;
 
-$maxElement = $arr[0];
-$minElement = $arr[0];
-$secondMaxElement = $arr[0];
-$secondMinElement = $arr[0]; 
-$i = 0;
-while($i < count($arr)){
-    if($arr[$i] >= $maxElement && $maxElement >= $secondMaxElement)
-        $secondMaxElement = $maxElement; 
-        $maxElement = $arr[$i];
-    if($arr[$i] <= $minElement && $minElement <= $secondMinElement)  
-        $secondMinElement = $minElement; 
-        $minElement = $arr[$i];
-        
-    $i++;
+while($i<=$j && $j<$arrLength){
+    echo "i: $i, j: $j, temp: $sum\n";
+    if($sum < $k){ 
+        $sum += $arr[$j]; $j++;
+    }
+    else if($sum > $k){ 
+        $sum -= $arr[$i]; $i++;
+    }
+    else { 
+        echo "Target Found at index: $i and " . ($j-1) . "\n";
+        $sumLength = $j-$i; 
+        $targetLength = max($targetLength, $sumLength); 
+        $sum += $arr[$j]; $j++;
+    }
 }
-echo "Second Max element is: " . $secondMaxElement;
-echo "Second Min element is: " . $secondMinElement;
 
-
-
-
-
-
-
+?>

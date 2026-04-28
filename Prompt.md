@@ -62,3 +62,14 @@ Important:
 - Keep explanations concise but clear
 - Focus on understanding and intuition, not just code
 - Maintain consistency in style for future revision
+
+
+
+
+
+==============
+
+LeetCode (primary — filter Amazon tagged)
+NeetCode.io (structured roadmap + video solutions)
+AlgoExpert (optional for video explanations)
+Blind 75 + Grind 75 (must-do list)

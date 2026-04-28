@@ -54,6 +54,7 @@ for ($i = 0; $i < count($nums); $i++) {
     if ($nums[$i] > $max) {
         $second_max = $max;           // Old max becomes second
         $max        = $nums[$i];
+    // elseif ($arr[$i] < $maxElement && $arr[$i] > $secondMaxElement){ //Also a solution, but we need to check duplicates with $nums[$i] != $max to avoid wrong updates when max is repeated.
     } elseif ($nums[$i] > $second_max && $nums[$i] != $max) {
         $second_max = $nums[$i];      // Update second_max (skip duplicates)
     }
@@ -62,6 +63,7 @@ for ($i = 0; $i < count($nums); $i++) {
     if ($nums[$i] < $min) {
         $second_min = $min;           // Old min becomes second
         $min        = $nums[$i];
+    // elseif ($arr[$i] > $minElement && $arr[$i] < $secondMinElement){ //Also a solution, but we need to check duplicates with $nums[$i] != $min to avoid wrong updates when min is repeated.
     } elseif ($nums[$i] < $second_min && $nums[$i] != $min) {
         $second_min = $nums[$i];      // Update second_min (skip duplicates)
     }
@@ -107,8 +109,8 @@ function check(array $nums): bool {
     $rotationCount = 0;
 
     for ($i = 0; $i < $count; $i++) {
+//Imp->  $nextIndex = (int) ($i+1) % $count; //lets assume count 5, nextIndex give 1,2,3,4,5,1
         $nextIndex = ($i + 1) % $count;  // Wraps last -> first
-
         if ($nums[$i] > $nums[$nextIndex]) {
             $rotationCount++;
         }
@@ -128,13 +130,23 @@ var_dump(check([2, 1, 3, 4]));    // bool(false)  -- two drops
 // ============================================================
 // 5. LC 26 -- REMOVE DUPLICATES FROM SORTED ARRAY (IN-PLACE)
 // ============================================================
+
+
+// Initial naive approach (not in-place, just for understanding):
+$i=0; $count = count($arr); $rotatedCount = 0;
+while($i < $count-1){
+    if($arr[$i] == $arr[$i+1]){
+        unset($arr[$i]);
+    }
+    $i++;
+}
+
 // Intuition: Two-pointer approach.
 //   i = slow pointer (last unique position)
 //   j = fast pointer (scanner)
 //   When nums[j] != nums[i], move i forward and write nums[j] there.
 // TC: O(n)  |  SC: O(1)
 // ============================================================
-
 function removeDuplicates(array &$nums): int {
     $i = 0;  // Points to the last written unique element
 
@@ -166,47 +178,68 @@ echo "Array: " . implode(", ", array_slice($nums, 0, $len)) . "\n";
 // ============================================================
 // 6. LC 189 -- ROTATE ARRAY BY K POSITIONS (RIGHT)
 // ============================================================
+//Bruit-force approach (not in-place, just for understanding):
+$i=0; $j=0; $length = count($arr)-1; $rotated = 2;
+while($rotated){
+    $temp = $arr[$i];
+    while($j < $length){
+        $arr[$j] = $arr[$j+1];
+        $j++;
+    }
+    $arr[$j] = $temp;
+    $rotated--;
+    $i=0; $j=0;
+}
+print_r($arr);
 // Intuition: Reversal algorithm -- 3 reversals achieve rotation.
 //   Step 1: Reverse last k elements  ->  [..., k_reversed]
 //   Step 2: Reverse first n-k elements ->  [first_reversed, ...]
 //   Step 3: Reverse entire array       ->  final rotated result
 // TC: O(n)  |  SC: O(1)
 // ============================================================
+class Solution {
+function rotate(&$nums, $k) {
+        $arrLength = count($nums);
+        if($k == 0 || $arrLength == 0) return;
 
-function reverseArr(array &$nums, int $st, int $ed): void {
-    while ($st < $ed) {
-        [$nums[$st], $nums[$ed]] = [$nums[$ed], $nums[$st]];
-        $st++;
-        $ed--;
+        //imp ->    if ($k >= $n) return; // This check is not needed if we do k = k % n, as it will handle cases where k > n by effectively reducing it to a valid rotation within the array length.
+        //Below logic for handling cases where k is greater than the length of the array is crucial for ensuring that the rotation works correctly regardless of the value of k. By using the modulus operator, we can effectively reduce k to a valid rotation within the bounds of the array length. For example, if we have an array of length 10 and we want to rotate it by 14 positions, we can calculate k as follows:
+        $k = (int) $k % $arrLength; // k=14 on array of 10 -> effectively k=4
+        
+        //Example: For Right Rotate Just a simple logic. [-> 1, 2, 3, 4, | 5, 6, 7 ->] if k=3
+        //Let's say we have an array [1, 2, 3, 4, 5, 6, 7] and we want to rotate it to the right by 3 positions. The steps would be as follows:
+        //1. Reverse the last k elements: Reverse the last 3 elements [5, 6, 7] to get [7, 6, 5]. The array now
+        //   looks like this: [1, 2, 3, 4, 7, 6, 5].
+        //2. Reverse the first n-k elements: Reverse the first 4 elements [1, 2, 3, 4] to get [4, 3, 2
+        //   , 1]. The array now looks like this: [4, 3, 2, 1, 7, 6, 5].
+        //3. Reverse the entire array: Reverse the entire array [4, 3, 2, 1, 7, 6, 5] to get [5, 6, 7, 1, 2, 3, 4]. The final array is the rotated version of the original array.
+        // $this->reverse($nums, 0, $arrLength-$k-1);
+        // $this->reverse($nums, $arrLength-$k, $arrLength-1);
+        // $this->reverse($nums, 0, $arrLength-1);
+
+        //for Left Roate Just a simple logic [<- 1, 2, 3,| 4, 5, 6, 7 <-] if k=3
+        //Example: For Right Rotate Just a simple logic Let's say we have an array [1, 2, 3, 4, 5, 6, 7] and we want to rotate it to the left by 3 positions. The steps would be as follows:
+        //1. Reverse the first k elements: Reverse the first 3 elements [1, 2, 3] to get [3, 2, 1]. The array now looks like this: [3, 2, 1, 4, 5, 6, 7].
+        //2. Reverse the remaining n-k elements: Reverse the remaining 4 elements [4, 5, 6, 7] to get [7, 6, 5, 4]. The array now looks like this: [3, 2, 1, 7, 6, 5, 4].
+        //3. Reverse the entire array: Reverse the entire array [3, 2, 1, 7, 6, 5, 4] to get [4, 5, 6, 7, 1, 2, 3]. The final array is the rotated version of the original array.   
+        $this->reverse($nums, 0, $k-1); print_r($nums);
+        $this->reverse($nums, $k, $arrLength-1);print_r($nums);
+        $this->reverse($nums, 0, $arrLength-1);print_r($nums);
     }
+
+    function reverse(&$arr, $st, $ed){
+        echo "st: $st, ed: $ed\n";
+        while($st < $ed){
+            list($arr[$st], $arr[$ed]) = [$arr[$ed], $arr[$st]];
+            $st++; $ed--;
+        }
+    } 
 }
-
-function rotate(array &$nums, int $k): void {
-    $n = count($nums);
-
-    if ($k <= 0) return;
-
-    $k = $k % $n;  // k=14 on array of 10 -> effectively k=4
-
-    // Step 1: Reverse the last k elements
-    reverseArr($nums, $n - $k, $n - 1);
-
-    // Step 2: Reverse the first n-k elements
-    reverseArr($nums, 0, $n - $k - 1);
-
-    // Step 3: Reverse the entire array
-    reverseArr($nums, 0, $n - 1);
-}
-
-// Dry Run  ->  $nums = [1,2,3,4,5,6,7], k=3
-// Step 1 reverse last 3: [1,2,3,4, 7,6,5]
-// Step 2 reverse first 4: [4,3,2,1, 7,6,5]
-// Step 3 reverse all:     [5,6,7,1,2,3,4]  ok
-
-$nums = [1, 2, 3, 4, 5, 6, 7];
-rotate($nums, 3);
-echo "Rotated: " . implode(", ", $nums) . "\n";  // 5,6,7,1,2,3,4
-
+$arr = [1, 2, 3, 4, 5, 6, 7];
+$i=0;  $length = count($arr); $j=$length-1; $rotated = 3;
+$solution = new Solution();
+$solution->rotate($arr, $rotated);
+print_r($arr);
 
 // ============================================================
 // 7. LC 283 -- MOVE ZEROES TO END
@@ -219,7 +252,12 @@ echo "Rotated: " . implode(", ", $nums) . "\n";  // 5,6,7,1,2,3,4
 
 function moveZeroes(array &$nums): void {
     $i = 0;  // Next position to place a non-zero element
-
+    //Dry and Run the code with example to understand the logic. Let's say we have an array [0, 1, 0, 3, 12]. We want to move all the zeroes to the end while maintaining the relative order of the non-zero elements. The steps would be as follows:
+        //1. Initialize two pointers: We start with two pointers, i and j. The pointer i will keep track of the position where the next non-zero element should be placed, while the pointer j will iterate through the array to find non-zero elements. Initially, i is set to 0 (indicating the starting index for the next non-zero element) and j is set to 0 (the starting index of the array).
+        //2. Iterate through the array: We use a while loop to iterate through the array with the pointer j. For each element at index j:
+        //   - If the element is zero, we do nothing and move to the next element.
+        //   - If the element is non-zero, it means we have found a non-zero element and we need to move it to the position indicated by i. We swap the elements at indices i and j, and then increment i to point to the next position for the next non-zero element.
+        //3. Continue iterating: We continue iterating through the array until j reaches the end. By the end of the loop, all non-zero elements will have been moved to the front of the array in their original order, and all zeroes will be moved to the end.
     for ($j = 0; $j < count($nums); $j++) {
         if ($nums[$j] != 0) {           // Found a non-zero element
             [$nums[$i], $nums[$j]] = [$nums[$j], $nums[$i]];
@@ -235,6 +273,15 @@ function moveZeroes(array &$nums): void {
 // j=3: 3!=0 -> swap(nums[1],nums[3]) -> [1,3,0,0,12], i=2
 // j=4: 12!=0-> swap(nums[2],nums[4]) -> [1,3,12,0,0], i=3
 // Output: [1,3,12,0,0]
+
+
+//Another solution is 
+// We can optimize the approach using 2 pointers i.e. i and j. The pointer j will point to the first 0 in the array and i will point to the next index.
+
+// Assume, the given array is {1, 0, 2, 3, 2, 0, 0, 4, 5, 1}. Now, initially, we will place the 2-pointers like the following:
+// First, we iterate through the array to locate the position of the first zero, using a pointer j. If no zero is found, no further steps are needed.
+// Next, we set a second pointer i to j + 1 and start moving it forward through the array.
+// While moving i, whenever we encounter a non-zero element a[i], we swap it with the element at index j. After the swap, since j now holds a non-zero value, we increment j to point to the next zero.
 
 $nums = [0, 1, 0, 3, 12];
 moveZeroes($nums);
@@ -288,6 +335,40 @@ echo "Union: " . implode(", ", $result) . "\n";
 // ============================================================
 // 9. LC 268 -- MISSING NUMBER (0 to N)
 // ============================================================
+//Bruit-force approach (not optimal):
+$arr = [1,2,3,5];
+$naturalNumber = count($arr) + 1; // Since one number is missing, the total count should be n+1
+$i=1;
+while($i<=$naturalNumber){
+    $j = 0; $isFound = false;
+    while($j<count($arr)){
+        if($arr[$j] == $i){
+            $isFound = true;
+            break;
+        }
+        $j++;
+    }
+    if(!$isFound){
+        echo "Missing number: $i\n";
+        break;
+    }
+    $i++;
+}
+
+
+//Second Approch using hasmap
+$arr = [1,2,3,5];
+$naturalNumber = count($arr) + 1; // Since one number is missing, the total count should be n+1
+$i=1; $hashMap = [];
+foreach($arr as $num){
+    $hashMap[$num] = true; // Mark the presence of each number in the array
+}
+while($i<=$naturalNumber){
+    if(!isset($hashMap[$i])) echo "Missing number is: $i\n"; // If a number from 1 to n is not found in the hash map, it is the missing number
+    $i++;
+}
+
+
 // Intuition: Sum of first N natural numbers = N*(N+1)/2.
 //   Subtract actual array sum -> remainder is the missing number.
 // TC: O(n)  |  SC: O(1)
@@ -342,6 +423,22 @@ echo "Max consecutive ones: " . findMaxConsecutiveOnes([1, 1, 0, 1, 1, 1]) . "\n
 // ============================================================
 // 11. LC 136 -- SINGLE NUMBER (XOR TRICK)
 // ============================================================
+//Hash Map Approch
+$arr = [4,1,2,1,2];
+$arrLength = count($arr);
+
+$hashMap = [];
+foreach($arr as $value){
+    if(isset($hashMap[$value])) $hashMap[$value]++;
+    else $hashMap[$value] = 1;
+}
+foreach($hashMap as $key => $value){
+    if($value == 1) { 
+        echo($key); break;
+    }
+}
+
+
 // Intuition: XOR of a number with itself = 0; XOR with 0 = itself.
 //   All duplicates cancel out -> only the unique element remains.
 // TC: O(n)  |  SC: O(1)
