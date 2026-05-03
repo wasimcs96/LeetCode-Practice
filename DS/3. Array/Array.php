@@ -10,7 +10,7 @@
 // 1. MAX AND MIN IN AN ARRAY
 // ============================================================
 // Intuition: Track global max and min while traversing once.
-// TC: O(n)  |  SC: O(1)
+// TC: O(n)  |  SC: O(1)ß
 // ============================================================
 
 $nums = [10, 12, 5, 3, 7, 8];
@@ -520,6 +520,24 @@ echo "Longest subarray (sum=15): " . longestSubarraySumK([10, 5, 2, 7, 1, 9], 15
 // ============================================================
 // 12b. LONGEST SUBARRAY SUM K -- SLIDING WINDOW (only +ve numbers)
 // ============================================================
+
+//Approach -1 Using Hasmap
+$arr = [2,6,5,8,11]; $target = 14;
+$arrLength = count($arr);
+$i = 0; $j = $arrLength-1;
+
+$hasMapArr = []; $sum = 0; $maxLength = 0;
+foreach($arr as $value){
+    $hasMapArr[$value] = $value;
+}
+while($i <= $j){
+    $rem = $target - $arr[$i];
+    if(isset($hasMapArr[$rem])){
+        echo "Found Pair: ({$arr[$i]}, {$rem})\n";
+    }
+    $i++;
+}
+
 // Intuition: Expand right pointer; shrink left when sum > k.
 //   Only valid for non-negative arrays.
 // TC: O(n)  |  SC: O(1)
@@ -558,12 +576,14 @@ function longestSubarrayPositive(array $nums, int $k): int {
 
 function twoSum(array $nums, int $target): array {
     $map = [];  // value -> index
-
+    //2,7,11,15  k=9
+    //9-2 = 7 => set 7 in hasmap with i
+    
     for ($i = 0; $i < count($nums); $i++) {
         if (isset($map[$nums[$i]])) {
-            return [$map[$nums[$i]], $i];     // Complement was stored earlier
+            return [$map[$nums[$i]], $i];     // in hashmap 7 (7:0)is exits then return [0, 1] :  Complement was stored earlier
         }
-        $map[$target - $nums[$i]] = $i;       // Store complement -> index
+        $map[$target - $nums[$i]] = $i;       //9-2 = 7 => set 7 in hasmap with 0 :  Store complement -> index
     }
 
     return [];
@@ -640,6 +660,11 @@ echo "Sorted colors: " . implode(", ", $nums) . "\n";  // 0,0,1,1,2,2
 // ============================================================
 // 15. LC 169 -- MAJORITY ELEMENT (BOYER-MOORE VOTING)
 // ============================================================
+
+//Approach -1 Using HashMap
+
+
+//Approch -2 Using Boyer-Moore Voting Algorithm
 // Intuition: The majority element appears > n/2 times.
 //   Cancel each non-majority element with one majority element.
 //   The survivor after all cancellations is the majority element.
@@ -647,7 +672,33 @@ echo "Sorted colors: " . implode(", ", $nums) . "\n";  // 0,0,1,1,2,2
 // TC: O(n)  |  SC: O(1)
 // ============================================================
 
-function majorityElement(array $nums): int {
+function majorityElement($nums) {
+        $counter = 0;
+        $candidate = 0;
+
+        foreach($nums as $num){
+            if($counter == 0){ // If counter is 0, we need to choose a new candidate for majority element 
+                $candidate = $num; 
+                $counter = 1; // Reset counter to 1 for the new candidate 
+            }elseif($candidate == $num){ // If the current number is the same as the candidate, we increment the counter as it supports the candidate being the majority element 
+                $counter++;     
+            }else{ // If the current number is different from the candidate, we decrement the counter as it cancels out one occurrence of the candidate 
+                $counter--;
+            }
+        }
+        $counter = 0; // Reset counter to verify if the candidate is actually the majority element 
+        foreach($nums as $num){ 
+            if($num == $candidate){ 
+                $counter++; 
+            }
+        }
+        $majorityNumber = count($nums)/2; // Calculate the threshold for majority element (more than n/2 occurrences) 
+        if($counter > $majorityNumber){ 
+            return $candidate;
+        }
+    }
+
+function majorityElementV2(array $nums): int {
     $candidate = 0;
     $count     = 0;
 
@@ -660,7 +711,13 @@ function majorityElement(array $nums): int {
     }
 
     // Phase 2: Verify candidate (required if majority not guaranteed)
-    $verify = array_count_values($nums)[$candidate] ?? 0;
+    //$verify = array_count_values($nums)[$candidate] ?? 0;
+    $count = 0;
+    foreach ($nums as $num) {
+        if($num == $candidate) {
+            $verify++;
+        }
+    }
     if ($verify > count($nums) / 2) {
         return $candidate;
     }
@@ -685,28 +742,24 @@ echo "Majority element: " . majorityElement([2, 2, 1, 1, 1, 2, 2]) . "\n";  // 2
 // ============================================================
 
 function maxSubArray(array $nums): array {
-    $sum     = 0;
-    $max     = PHP_INT_MIN;
-    $start   = 0;
-    $end     = 0;
-    $tempStr = 0;
-
-    for ($i = 0; $i < count($nums); $i++) {
-        if ($sum === 0) $tempStr = $i;  // Potential new start
-
-        $sum += $nums[$i];
-
-        if ($sum > $max) {
-            $max   = $sum;
-            $start = $tempStr;
-            $end   = $i;
+    $arrLength = count($nums);
+    $tempSum = 0; $maxSum = PHP_INT_MIN; $tempStr = -1; $maxSumArrStrIndex = $maxSumArrEndIndex = -1;
+    for($i=0; $i < $arrLength; $i++){
+        if($tempSum == 0){
+            $tempStr = $i; // Starting index of the current subarray 
+        }
+        $tempSum += $nums[$i]; // Update tempSum by adding the current element to it 
+        if($tempSum > $maxSum){ // Update maxSum and the corresponding indices if a new maximum is found 
+            $maxSum = $tempSum; // Update maxSum with the new maximum sum found
+            $maxSumArrStrIndex = $tempStr; // Update the starting index of the maximum sum subarray to the current tempStr index 
+            $maxSumArrEndIndex = $i;// Update the ending index of the maximum sum subarray to the current index 
         }
 
-        if ($sum < 0) $sum = 0;  // Discard negative prefix
+        if($tempSum < 0) $tempSum = 0; // Reset tempSum to 0 if it becomes negative, as a negative sum would not contribute to a maximum sum in future iterations 
     }
 
-    return ['maxSum' => $max, 'start' => $start, 'end' => $end,
-            'subarray' => array_slice($nums, $start, $end - $start + 1)];
+    return ['maxSum' => $maxSum, 'start' => $maxSumArrStrIndex, 'end' => $maxSumArrEndIndex,
+            'subarray' => array_slice($nums, $maxSumArrStrIndex, $maxSumArrEndIndex - $maxSumArrStrIndex + 1)];
 }
 
 // Dry Run  ->  $nums = [-2,1,-3,4,-1,2,1,-5,4]
@@ -729,22 +782,34 @@ echo "Subarray: " . implode(", ", $result['subarray']) . "\n";  // 4,-1,2,1
 // ============================================================
 // 17. LC 121 -- BEST TIME TO BUY AND SELL STOCK
 // ============================================================
+//Approach -1 Bruit-force approach (not optimal):
+//Using two nested loops, we can iterate through all possible pairs of days (i, j) where i < j. For each pair, we calculate the profit by subtracting the price on day i from the price on day j. We keep track of the maximum profit encountered during this process. However, this approach has a time complexity of O(n^2) due to the nested loops, which is not efficient for large input sizes.
+
+//Approach -2 Optimal (Single Pass):
 // Intuition: Track the minimum price seen so far (buy point).
 //   For each day, profit = price - min_buy.
 //   Track global maximum profit.
 // TC: O(n)  |  SC: O(1)
 // ============================================================
 
-function maxProfit(array $prices): int {
-    $maxProfit = 0;
-    $minBuy    = PHP_INT_MAX;
+function maxProfit($prices) {
+        $maxProfit = 0; // Initialize maxProfit to 0, as the minimum profit we can have is 0 (if we do not make any transaction or if all transactions result in a loss). 
+        $minPrice = PHP_INT_MAX; // Initialize minPrice to the maximum possible integer value to ensure that any price in the array will be less than this initial value.
 
-    foreach ($prices as $price) {
-        $minBuy    = min($minBuy, $price);              // Update cheapest buy
-        $maxProfit = max($maxProfit, $price - $minBuy); // Update best profit
-    }
-
-    return $maxProfit;
+        foreach ($prices as $price) {
+            if($price < $minPrice){ // Check if the current price is less than the current minPrice. If it is, update minPrice to this new value, ensuring that we always have the lowest price encountered so far. 
+                $minPrice = $price; // Update minPrice if the current price is less than the current minPrice, ensuring that we always have the lowest price encountered so far. 
+            }else{
+                $profit = $price - $minPrice; // Calculate the potential profit by subtracting the minimum price from the current price.
+                if($profit > $maxProfit){ // Check if the calculated profit is greater than the current maxProfit. If it is, update maxProfit to this new value, ensuring that we always have the maximum profit encountered so far. 
+                    $maxProfit = $profit; // Update maxProfit if the calculated profit is greater than the current maxProfit.
+                }
+            }
+            //Sortest Version of above item
+            //$minPrice    = min($minPrice, $price);              // Update minPrice if current price is lower than minPrice  
+            //$maxProfit   = max($maxProfit, $price - $minPrice); // Update best profit if selling at current price yields better profit than maxProfit 
+        }
+        return $maxProfit;
 }
 
 // Dry Run  ->  $prices = [7,1,5,3,6,4]
@@ -762,7 +827,25 @@ echo "Max profit: " . maxProfit([7, 1, 5, 3, 6, 4]) . "\n";  // 5
 // ============================================================
 // 18. LC 2149 -- REARRANGE ARRAY ELEMENTS BY SIGN
 // ============================================================
+//Approach -1 
+// Intuition: Separate positives and negatives into two arrays, then interleave. 
+$nums = [1,2,-4,-5];
+$posArr = $negArr = [];
+foreach($nums as $num) {
+    if($num > 0) {
+        $posArr[] = $num;
+    } else {
+        $negArr[] = $num;
+    }
+}
+$nums[0]=$posArr[0];
+$nums[1]=$negArr[0];
 
+for($i=0; $i<count($nums)/2; $i++) {
+    $nums[2*$i] = $posArr[($i)];
+    $nums[2*$i+1] = $negArr[($i)];
+}
+print_r($nums);
 // --- 18a. Equal positives and negatives (optimal O(n)) ---
 // Intuition: Positives at even indices (0,2,4...), negatives at odd (1,3,5...).
 //   Single pass with two independent index pointers.
@@ -826,6 +909,59 @@ print_r(rearrangeUnequal([-1, 1, -2, -3, 2, 3])); // interleaved + extra negativ
 //   If no dip found -> array is fully descending -> reverse all (wraps to first).
 // TC: O(n)  |  SC: O(1)
 // ============================================================
+//    ->1,   //swap 1 and 3 like just greate number and after aswap this make sort after 3 values 23 00145
+//   2    5,  
+//          4,
+//         -> 3,
+//              0,
+//                0
+$nums = [2, 1, 5, 4, 3, 0, 0]; 
+$n = count($nums); $breakPoint = -1;
+
+        //1. Find the RIGHTMOST index i where nums[i] < nums[i+1] (dip point)
+        //Find the rightmost pair of indices (i, i+1) such that nums[i] < nums[i+1]. If no such pair exists, the array is in descending order, and we can simply reverse it to get the lowest order (first permutation).
+        // Otherwise, let i be the first index of the pair, we need to find the rightmost index j such that nums[i] < nums[j]. Since the suffix nums[i+1..n-1] is in descending order, we can scan from the end until we find an element that is greater than nums[i]. 
+        //Dry and Run: 
+        // For example, if the input array is [2, 1, 5, 4, 3, 0,0], we can find the rightmost pair of indices (i, i+1) such that nums[i] < nums[i+1]. In this case, the pair is (5,6) because nums[5] = 0 and nums[6] = 0. Since 0 is not less than 0, we continue scanning until we find the next pair. The next pair is (1, 2) because nums[1] = 1 and nums[2] = 5. Since 1 is less than 5, we have found our break point at index 1.
+        for($i=$n-2; $i>=0; $i--){
+            if($nums[$i] < $nums[$i+1]){ //[2, 1,| 5, 4, 3, 0,0]
+                $breakPoint = $i;
+                break;
+            }
+        }
+        // If no such index exists, the array is in descending order, and we can simply reverse it to get the lowest order (first permutation).
+        // In our example, since we found the break point at index 1, we will not reverse the array. Instead, we will proceed to find the rightmost index j such that nums[i] < nums[j] and swap the values at indices i and j.
+        // If no such index exists, the array is in descending order, and we can simply reverse it to get the lowest order (first permutation).
+        // Like if the input array is [5, 4, 3, 2, 1], we will not find any pair of indices (i, i+1) such that nums[i] < nums[i+1]. In this case, the break point will remain -1, indicating that the array is in descending order. Therefore, we will reverse the array to get [1, 2, 3, 4, 5], which is the lowest order (first permutation).
+        if($breakPoint == -1){
+            // Reverse the array to get the first permutation.
+            $nums = array_reverse($nums);
+            return;
+        }
+
+        // 2. Find the RIGHTMOST index j > i where nums[j] > nums[i], swap them
+        // If such an index exists, find the rightmost index j such that nums[i] < nums[j]. Since the suffix nums[i+1..n-1] is in descending order, we can scan from the end until we find an element that is greater than nums[i]. 
+        for($i=$n-1; $i>$breakPoint; $i--){
+            if($nums[$i] > $nums[$breakPoint]){
+                // Swap the value of nums[i] with that of nums[breakPoint]. //give greate then 1 is 3 => 2,"1",5,4,"3"
+                list($nums[$i], $nums[$breakPoint]) = [$nums[$breakPoint], $nums[$i]];
+                break;
+            }
+        }
+        // 3. Reverse the suffix after index i (makes it the smallest arrangement)
+        // Finally, reverse the suffix nums[i+1..n-1] to get the next permutation.
+        // After swapping the values at indices i and j, we need to reverse the suffix nums[i+1..n-1] to get the next permutation. 
+        // This is because the suffix is in descending order, and reversing it will give us the lowest order (first permutation) for that suffix, 
+        // which is necessary to ensure that we get the next permutation in lexicographical order. In our example, after swapping the values at indices 1 and 2, we will have the array 
+        // [2, 5, 1, 4, 3, 0, 0]. We will then reverse the suffix starting from index 2 [1, 4, 3, 0, 0] to the end of the array, resulting in [2, 5, 0, 0, 3, 4, 1], 
+        // which is the next permutation of the original array [2, 1, 5, 4, 3, 0, 0].
+        while($breakPoint < $n-1){
+            list($nums[$breakPoint+1], $nums[$n-1]) = [$nums[$n-1], $nums[$breakPoint+1]];
+            $breakPoint++;
+            $n--;
+        }
+        return;
+
 
 function nextPermutation(array &$nums): void {
     $n   = count($nums);
@@ -877,26 +1013,89 @@ echo "Next permutation: " . implode(", ", $nums) . "\n";
 // ============================================================
 
 function longestConsecutive(array $nums): int {
-    $numSet   = array_flip($nums);  // O(1) lookup
+    $nums = [0,3,7,2,8,4,6,0,1]; 
+    //Approach 1: Sort linearly and count consecutive sequences 
+    // Dry Run  ->  $nums = [100,4,200,1,3,2]
+    // After sorting: [1,2,3,4,100,200]
+    // Count consecutive sequences: 1,2,3,4 is length 4; 100 alone is length 1; 200 alone is length 1. Max length = 4. 
+    // Output: 4  (sequence 1,2,3,4)
+    sort($nums); // O(n log n)
     $maxCount = 0;
-
-    foreach ($numSet as $num => $_) {
-        // Only start from sequence beginning (no num-1 in set)
-        if (!isset($numSet[$num - 1])) {
-            $current = $num;
-            $count   = 1;
-
-            while (isset($numSet[$current + 1])) {
-                $current++;
-                $count++;
+    for($i = 0; $i < count($nums); $i++){
+        $tempCount = 1;
+        for($j = $i + 1; $j < count($nums); $j++){
+            if($nums[$j] == $nums[$j - 1]) continue; // Skip duplicates
+            else if($nums[$j] == $nums[$j - 1] + 1){
+                $tempCount++;
+            } else {
+                break; // Break if the sequence is not consecutive
             }
+        }
+        $maxCount = max($maxCount, $tempCount);
+    }
+    echo "Longest Consecutive Sequence Length (Approach 1): " . $maxCount . "\n";
 
-            $maxCount = max($maxCount, $count);
+    //Approach 2: HashSet for O(n) time complexity
+    // Dry Run  ->  $nums = [100,4,200,1,3,2]
+// Set: {100,4,200,1,3,2}
+// num=100: no 99 in set -> count 100 only -> len=1
+// num=4:   3 in set -> skip (not a start)
+// num=200: no 199 -> len=1
+// num=1:   no 0 -> count 1,2,3,4 -> len=4
+// Output: 4  (sequence 1,2,3,4)
+    $numsSet = array_flip($nums); // Convert to associative array for O(1) lookup
+    $maxCount = 0;
+    foreach($nums as $num){
+        // Only start counting if this is the beginning of a sequence like 1, not 2 or 3 which would have been counted when we started at 1 
+        if(!isset($numsSet[$num - 1])){ //0 for 1// Check if the previous number is not in the set, meaning this is the start of a sequence for example 1, not 2 or 3 which would have been counted when we started at 1 
+            $tempCount = 1;
+            //  Keep counting the next consecutive numbers like 2, 3, 4... until we find a gap 
+            // 1+1=2, 1+2=3, 1+3=4...
+            while(isset($numsSet[$num + $tempCount])){ // Check for the next consecutive number 
+                $tempCount++;
+            }
+            $maxCount = max($maxCount, $tempCount);
         }
     }
+    echo "Longest Consecutive Sequence Length (Approach 2): " . $maxCount . "\n";
 
-    return $maxCount;
-}
+    //Approach 3: HashMap with memoization to store sequence lengths
+    // DRY AND RUN BASED ON. BELOW APPROACH 3 
+    // Dry Run  ->  $nums = [100,4,200,1,3,2]
+    // Set: {100,4,200,1,3,2}
+            $maxCount = 0;
+            $hash = [];
+            $count = count($nums);
+
+            // Initialize hash map with all numbers as keys and 0 as value (indicating unvisited) 
+            for($i = 0; $i < $count; $i++){
+            $hash[$nums[$i]] = 0;
+            }
+            // Iterate through each number in the hash map 
+            foreach($hash as $key => $val){
+            //if key = 5 then while will check 6,7,8
+            $counter=0;
+            $counterStart = $key; //5
+            // Only start counting if this is the beginning of a sequence (i.e., key-1 is not in hash) 
+            if(!isset($hash[$key - 1])){ // Check if the previous number is not in the hash map, meaning this is the start of a sequence for example 1, not 2 or 3 which would have been counted when we started at 1 
+            while(isset($hash[$key])){ //check 5,6,7,8....  // Check if the current key exists in the hash map, meaning it's part of the current sequence   
+                if($hash[$key] != 0){ //if already calculated for 6 will be 3 =>6,7,8 
+                    $counter += $hash[$key]; // Add the count of the sequence starting from this key 
+                    unset($hash[$key]);
+                }
+                else{
+                    unset($hash[$key]); // Mark as visited 
+                    $counter++;
+                    $key++;
+                }
+           
+          }
+          $hash[$counterStart] = $counter; // Store the count of the sequence starting from the original key (e.g., 5 => 4 for 5,6,7,8) 
+          $maxCount = max($maxCount, $counter);
+          //print_r($hash); die;
+        }
+    }
+        echo "Longest Consecutive Sequence Length (Approach 3): " . $maxCount . "\n";}
 
 // Dry Run  ->  $nums = [100,4,200,1,3,2]
 // Set: {100,4,200,1,3,2}
