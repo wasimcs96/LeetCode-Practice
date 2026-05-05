@@ -992,17 +992,23 @@ function nextPermutation(array &$nums): void {
     // Step 3: Reverse suffix after dip
     reverseArr($nums, $dip + 1, $n - 1);
 }
-
 // Dry Run  ->  $nums = [2,1,5,4,3,0,0]
 // Step 1: scan right->left: 3>0 skip, 4>3 skip, 5>4 skip, 1<5 -> dip=1
 // Step 2: scan right for > nums[1]=1: found 3 at idx 4 -> swap -> [2,3,5,4,1,0,0]
 // Step 3: reverse suffix after idx 1 -> [2,3,0,0,1,4,5]
 // Output: [2,3,0,0,1,4,5]  ok
 
-$nums = [2, 1, 5, 4, 3, 0, 0];
+$nums = [2, 1, 5, 4, 3, 0, 0];  
 nextPermutation($nums);
 echo "Next permutation: " . implode(", ", $nums) . "\n";
 
+function reverseArr(array &$arr, int $start, int $end): void {
+    while ($start < $end) {
+        [$arr[$start], $arr[$end]] = [$arr[$end], $arr[$start]];
+        $start++;
+        $end--;
+    }
+}
 
 // ============================================================
 // 20. LC 128 -- LONGEST CONSECUTIVE SEQUENCE
@@ -1063,9 +1069,9 @@ function longestConsecutive(array $nums): int {
     // DRY AND RUN BASED ON. BELOW APPROACH 3 
     // Dry Run  ->  $nums = [100,4,200,1,3,2]
     // Set: {100,4,200,1,3,2}
-            $maxCount = 0;
+    $maxCount = 0;
             $hash = [];
-            $count = count($nums);
+              $count = count($nums); 
 
             // Initialize hash map with all numbers as keys and 0 as value (indicating unvisited) 
             for($i = 0; $i < $count; $i++){
@@ -1075,7 +1081,7 @@ function longestConsecutive(array $nums): int {
             foreach($hash as $key => $val){
             //if key = 5 then while will check 6,7,8
             $counter=0;
-            $counterStart = $key; //5
+              $counterStart = $key; //5 
             // Only start counting if this is the beginning of a sequence (i.e., key-1 is not in hash) 
             if(!isset($hash[$key - 1])){ // Check if the previous number is not in the hash map, meaning this is the start of a sequence for example 1, not 2 or 3 which would have been counted when we started at 1 
             while(isset($hash[$key])){ //check 5,6,7,8....  // Check if the current key exists in the hash map, meaning it's part of the current sequence   
@@ -1095,7 +1101,7 @@ function longestConsecutive(array $nums): int {
           //print_r($hash); die;
         }
     }
-        echo "Longest Consecutive Sequence Length (Approach 3): " . $maxCount . "\n";}
+    echo "Longest Consecutive Sequence Length (Approach 3): " . $maxCount . "\n";}        
 
 // Dry Run  ->  $nums = [100,4,200,1,3,2]
 // Set: {100,4,200,1,3,2}
@@ -1111,6 +1117,48 @@ echo "Longest consecutive: " . longestConsecutive([100, 4, 200, 1, 3, 2]) . "\n"
 // ============================================================
 // 21. LC 48 -- ROTATE IMAGE (90 degrees CLOCKWISE, IN-PLACE)
 // ============================================================
+
+// if you want to rotate clockwise, first transpose first column to first row and then reverse each row 
+// if you want to rotate anti-clockwise, first transpose last column to first row and then reverse each row
+
+     
+// Intuition: Two-step process:
+//   1. Transpose  -> matrix[i][j] swaps with matrix[j][i] where i = n - 1 - j to get the mirror image along the main diagonal  
+//   2. Reverse each row  -> completes the 90 degree clockwise rotation
+// TC: O(n^2)  |  SC: O(1)
+
+$matrix = [
+              [1,2,3],
+              [4,5,6],
+              [7,8,9]
+        ];
+
+
+    $n = count($matrix);
+    $m = count($matrix[0]);
+
+    $i = 0; $j = $m-1;
+    while ($i < $n && $j >= 0) { //transpose 
+        $k = $i; $l = $j;
+        while ($k < $n && $l >=0) { //swap row i with column j //change 2 ND 6 AND 1 AND 9 IN Second iteration 4,8 IN Third iteration 7
+            list($matrix[$i][$l], $matrix[$k][$j]) = [$matrix[$k][$j], $matrix[$i][$l]];
+            $k++; $l--;
+        }
+        //echo "After swapping row $i and column $j:\n";
+        $i++; $j--;
+    }
+    $k=0; $l=0;
+    //reverse each coulmn
+    while($k < $m) { //columm
+        $l=0;
+        while($l < $n-1-$l) { //row
+          list($matrix[$l][$k], $matrix[$n-1-$l][$k]) = [$matrix[$n-1-$l][$k], $matrix[$l][$k]];
+          $l++;
+        }
+        $k++;
+    }
+
+
 // Intuition: Two-step process:
 //   1. Transpose  -> matrix[i][j] swaps with matrix[j][i]
 //   2. Reverse each row  -> completes the 90 degree clockwise rotation
@@ -1149,6 +1197,52 @@ foreach ($matrix as $row) echo implode(" ", $row) . "\n";
 // ============================================================
 // 22. LC 73 -- SET MATRIX ZEROES (IN-PLACE, O(1) SPACE)
 // ============================================================
+//Approach -1: Brute-force with O(m*n) space
+// Intuition: First pass to find all zeroes and store their positions in a hash map. Second pass to set rows and columns to zero based on the stored positions. This approach uses O(m*n) space in the worst case (if all elements are zero).
+// TC: O(m*n)  |  SC: O(m*n) 
+$matrix = [[0,1,2,0],[3,4,5,2],[1,3,1,5]];
+$n = count($matrix);
+$m = count($matrix[0]);
+$hahmap = [];
+
+for($i=0; $i<$n; $i++) {
+    for($j=0; $j<$m; $j++) {
+        if($matrix[$i][$j] === 0) {
+            $hahmap[$i."-".$j] = TRUE; // Second Approch you can mark -1 and next time you can check if -1 is there then mark 0 and at last you can change all -1 to 0.
+            //Third Approch you can create two seprate array for row and column and mark them as 0 and at last you can mark all those row and column as 0.   
+            //Space complexity will be O(m+n) in this case.
+        }
+    }
+}
+
+for($i=0; $i<$n; $i++) {
+    for($j=0; $j<$m; $j++) {
+        if($matrix[$i][$j] === 0 && isset($hahmap[$i."-".$j])){ 
+            $x= $i; $y = $j;
+            while($y >= 0){
+              $matrix[$x][$y] = 0;
+              $y--;
+            }
+            $y = $j;
+            while($m > $y){
+              $matrix[$x][$y] = 0;
+              $y++;
+            }
+            $x= $i; $y = $j;
+            while($x >= 0){
+              $matrix[$x][$y] = 0;
+              $x--;
+            }
+            $x= $i;
+            while($n > $x){
+              $matrix[$x][$y] = 0;
+              $x++;
+            }
+        }
+    }
+}
+
+
 // Intuition: Use first row and first column as marker arrays.
 //   - matrix[i][0]=0 marks row i should be zeroed.
 //   - matrix[0][j]=0 marks col j should be zeroed.
@@ -1158,54 +1252,73 @@ foreach ($matrix as $row) echo implode(" ", $row) . "\n";
 // ============================================================
 
 function setZeroes(array &$matrix): void {
-    $rows = count($matrix);
-    $cols = count($matrix[0]);
-    $col0 = 1;  // Tracks if column 0 should be zeroed
+    $n = count($matrix);
+    $m = count($matrix[0]);
+    $firstRowZero = FALSE;
+    $firstColZero = FALSE;
 
-    // Pass 1: Mark first row/col as flags
-    for ($i = 0; $i < $rows; $i++) {
-        for ($j = 0; $j < $cols; $j++) {
-            if ($matrix[$i][$j] === 0) {
-                $matrix[$i][0] = 0;    // Mark row
-
-                if ($j !== 0) {
-                    $matrix[0][$j] = 0;  // Mark column
-                } else {
-                    $col0 = 0;           // Column 0 itself has a zero
-                }
+    for($i=0; $i<$n; $i++) {
+        for($j=0; $j<$m; $j++) {
+            if($matrix[$i][$j] === 0) {
+                if ($i === 0) $firstRowZero = TRUE;
+                if ($j === 0) $firstColZero = TRUE;
             }
         }
     }
 
-    // Pass 2: Zero inner cells (skip row 0 and col 0 -- they're markers)
-    for ($i = 1; $i < $rows; $i++) {
-        for ($j = 1; $j < $cols; $j++) {
-            if ($matrix[$i][0] === 0 || $matrix[0][$j] === 0) {
+    for($i=1; $i<$n; $i++) {
+        for($j=1; $j<$m; $j++) {
+            if($matrix[$i][$j] === 0){ 
+                $matrix[0][$j] = 0;
+                $matrix[$i][0] = 0;
+            }
+        }
+    }
+    //Output of above loop will be [[0,1,0,0],
+    //                             [0,4,0,2],
+    //                             [1,3,1,5]
+    //                            ]
+
+    for($i=1; $i<$n; $i++) {
+        for($j=1; $j<$m; $j++) {
+            if($matrix[0][$j] === 0 || $matrix[$i][0] === 0){  // If any of the row or column is marked as 0 then mark all those row and column as 0. 
                 $matrix[$i][$j] = 0;
             }
         }
     }
-
-    // Pass 3: Handle first row using matrix[0][0]
-    if ($matrix[0][0] === 0) {
-        for ($j = 0; $j < $cols; $j++) $matrix[0][$j] = 0;
+    //Output of above loop will be [[0,1,0,0],
+    //                             [0,0,0,0],
+    //                             [1,3,0,5]
+    //                            ]
+    if($firstRowZero) { 
+        for($j=0; $j<$m; $j++) {
+            $matrix[0][$j] = 0;
+        }
+    }
+    //Output of above loop will be [[0,0,0,0],
+    //                             [0,0,0,0],
+    //                             [1,3,0,5]
+    //                            ]
+    if($firstColZero) {
+    for($i=0; $i<$n; $i++) {
+            $matrix[$i][0] = 0;
+        }
+    }
+    //Output of above loop will be [[0,0,0,0],
+    //                             [0,0,0,0],
+    //                             [0,3,0,0]
+    //                            ] 
     }
 
-    // Pass 4: Handle first column using col0 flag
-    if ($col0 === 0) {
-        for ($i = 0; $i < $rows; $i++) $matrix[$i][0] = 0;
-    }
-}
+    // Dry Run  ->  [[1,1,1],[1,0,1],[1,1,1]]
+    // Pass 1: matrix[1][1]=0 -> mark matrix[1][0]=0, matrix[0][1]=0
+    // Pass 2: row 1 -> all 0; col 1 -> all 0
+    // Result: [[1,0,1],[0,0,0],[1,0,1]]  ok
 
-// Dry Run  ->  [[1,1,1],[1,0,1],[1,1,1]]
-// Pass 1: matrix[1][1]=0 -> mark matrix[1][0]=0, matrix[0][1]=0
-// Pass 2: row 1 -> all 0; col 1 -> all 0
-// Result: [[1,0,1],[0,0,0],[1,0,1]]  ok
-
-$matrix = [[1, 1, 1], [1, 0, 1], [1, 1, 1]];
-setZeroes($matrix);
-echo "Matrix with zeroes:\n";
-foreach ($matrix as $row) echo implode(" ", $row) . "\n";
+    $matrix = [[1, 1, 1], [1, 0, 1], [1, 1, 1]];
+    setZeroes($matrix);
+    echo "Matrix with zeroes:\n";
+    foreach ($matrix as $row) echo implode(" ", $row) . "\n";
 
 
 // ============================================================
