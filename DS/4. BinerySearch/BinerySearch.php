@@ -23,6 +23,100 @@
 // ============================================================
 
 
+//Search in sorted array
+$arr = [1,2,2,3]; $k=2;
+
+$low = 0; $high = count($arr)-1;
+
+echo binerySearch($arr, $low, $high, $k);
+function binerySearch(array $arr, int $low, int $high, int $k){
+    if($low > $high) return -1;
+    $mid = (int) (($low+$high) / 2);
+    if($arr[$mid] == $k) return $mid;
+    if($arr[$mid] > $k) $high = $mid - 1;
+    if($arr[$mid] < $k) $low = $mid + 1;
+    return binerySearch($arr, $low, $high, $k);
+    
+}
+
+
+//find Lower Bound in a sorted array
+//Definition: The lower bound of a key is the index of the first element in the array that is greater than or equal to the key. If all elements are less than the key, it returns the length of the array. 
+$nums = [3,5,8,15,15,19]; $target=15;
+$high = count($nums)-1; $low = 0;
+$ans = $high+1;
+$ans = binerySearch($nums, $low, $high, $target, $ans);
+echo $ans;
+
+
+function binerySearch(array $nums, int $low, int $high, int $key, int $ans): int {
+    if($low > $high) return $ans;
+
+    $mid = (int) (($low+$high) / 2);
+
+    if($nums[$mid] >= $key) {
+        $ans = $mid;
+        return binerySearch($nums, $low, $mid-1, $key, $ans);
+    }
+    else return binerySearch($nums, $mid+1, $high, $key, $ans);
+}
+
+//find Upper Bound in a sorted array
+//Definition: The upper bound of a key is the index of the first element in the array that is greater than the key. If all elements are less than or equal to the key, it returns the length of the array.
+$nums = [3,5,5,8,9,15,19]; $target=5;
+$high = count($nums)-1; $low = 0;
+$ans = $high+1;
+$ans = binerySearch($nums, $low, $high, $target, $ans);
+echo $ans;
+
+
+function binerySearch(array $nums, int $low, int $high, int $key, int $ans): int {
+    if($low > $high) return $ans;
+
+    $mid = (int) (($low+$high) / 2);
+
+    if($nums[$mid] > $key) {
+        $ans = $mid;
+        return binerySearch($nums, $low, $mid-1, $key, $ans);
+    }
+    else return binerySearch($nums, $mid+1, $high, $key, $ans);
+}
+
+//find Floor and Ceiling in a sorted array
+$nums = [3, 4, 4, 7, 8, 10]; $target=2;
+$high = count($nums)-1; $low = 0;
+$ans = $high+1;
+$floorValue = findFloor($nums, $low, $high, $target, $low);
+$ceilingValue  = findCeiling($nums, $low, $high, $target, $high+1);
+
+echo $nums[$floorValue] . " " . $nums[$ceilingValue];
+
+
+function findFloor(array $nums, int $low, int $high, int $key, int $ans): int {
+    if($low > $high) return $ans;
+
+    $mid = (int) (($low+$high) / 2);
+
+    if($nums[$mid] <= $key) {
+        $ans = $mid;
+        return findFloor($nums, $mid+1, $high, $key, $ans);
+    }
+    else return findFloor($nums, $low, $mid-1, $key, $ans);
+}
+
+function findCeiling(array $nums, int $low, int $high, int $key, int $ans): int {
+    if($low > $high) return $ans;
+
+    $mid = (int) (($low+$high) / 2);
+
+    if($nums[$mid] >= $key) {
+        $ans = $mid;
+        return findCeiling($nums, $low, $mid-1, $key, $ans);
+    }
+    else return findCeiling($nums, $mid+1, $high, $key, $ans);
+}
+
+
 // ============================================================
 // 1. FIND FIRST AND LAST POSITION (LeetCode 34)
 // ============================================================
@@ -100,6 +194,9 @@ $last  = findLast($nums,  0, $n - 1, $key, -1);
 echo "First & Last Position of $key: [$first, $last]\n"; // [3, 4]
 
 
+//Search Insert Position
+
+
 // ============================================================
 // 2. SEARCH IN ROTATED SORTED ARRAY (LeetCode 33)
 // ============================================================
@@ -125,37 +222,87 @@ echo "First & Last Position of $key: [$first, $last]\n"; // [3, 4]
 // TC: O(log N)
 // SC: O(1)
 
-function searchRotated(array $nums, int $key): int
+function searchRotated(array $nums, int $target): int
 {
-    $low  = 0;
-    $high = count($nums) - 1;
+        $low  = 0;
+        $high = count($nums) - 1;
+        $key=$target; 
 
-    while ($low <= $high) {
-        $mid = $low + intdiv($high - $low, 2);
+        while ($low <= $high) {
+            $mid = (int) (($low + $high) / 2);
 
-        if ($nums[$mid] === $key) {
-            return $mid; // Target found
+            if ($nums[$mid] === $key) {
+                return $mid; // Target found
+            }
+
+            //Additional Check Edge Case only when there are duplicates in the array
+            // if ($nums[$low] == $nums[$mid] && $nums[$mid] == $nums[$high]) {
+            //     $low++;
+            //     $high--;
+            //     continue;
+            // }
+
+
+            // Determine which half is sorted
+            if ($nums[$low] <= $nums[$mid]) {
+                // LEFT half [low .. mid] is sorted
+                if ($nums[$low] <= $key && $key < $nums[$mid]) {
+                    $high = $mid - 1; // Target is inside the sorted left half
+                } else {
+                    $low = $mid + 1;  // Target is in the rotated right half
+                }
+            } else {
+                // RIGHT half [mid .. high] is sorted
+                if ($nums[$mid] < $key && $key <= $nums[$high]) {
+                    $low = $mid + 1;  // Target is inside the sorted right half
+                } else {
+                    $high = $mid - 1; // Target is in the rotated left half
+                }
+            }
         }
 
-        // Determine which half is sorted
-        if ($nums[$low] <= $nums[$mid]) {
-            // LEFT half [low .. mid] is sorted
-            if ($nums[$low] <= $key && $key < $nums[$mid]) {
-                $high = $mid - 1; // Target is inside the sorted left half
-            } else {
-                $low = $mid + 1;  // Target is in the rotated right half
-            }
-        } else {
-            // RIGHT half [mid .. high] is sorted
-            if ($nums[$mid] < $key && $key <= $nums[$high]) {
-                $low = $mid + 1;  // Target is inside the sorted right half
-            } else {
-                $high = $mid - 1; // Target is in the rotated left half
-            }
-        }
-    }
+        return -1; // Not found
 
-    return -1; // Not found
+        // $high = $length = count($nums)-1; $low = $start = 0; $key=$target;
+        // $ans = -1;
+        // $roatePoint = -1;
+        // while($start < $length){
+        //     if($nums[$start] > $nums[$start+1]){
+        //         $roatePoint = $start+1;
+        //         break;
+        //     }
+        //     $start++;
+        // }
+
+        // if($roatePoint != -1){
+        //     if($key == $nums[$roatePoint]){
+        //       return $roatePoint;
+        //     }else if($nums[$roatePoint] <= $key && $key <= $nums[$high]){
+        //       return $this->searchIndex($nums, $roatePoint, $high, $key, $ans);
+        //     }else{
+        //       return $this->searchIndex($nums, $low, $roatePoint-1, $key, $ans);
+        //     }
+        //     return $ans;
+        // }else{
+        //   return $this->searchIndex($nums, $low, $high, $key, $ans);
+        // }
+        // return -1;
+    
+
+    //take TC -> O(N)
+    // function searchIndex($nums, $low, $high, $key, $ans){
+    //     if($low > $high) return $ans;
+      
+    //     $mid = (int) (($low+$high) / 2);
+    //     if($nums[$mid] == $key ) {
+    //         return $mid;
+    //     }else if($nums[$mid] > $key){
+    //         return $this->searchIndex($nums, $low, $mid-1, $key, $ans);
+    //     }
+    //     else{
+    //         return $this->searchIndex($nums, $mid+1, $high, $key, $ans);
+    //     }
+    // }
 }
 
 // --- Run ---

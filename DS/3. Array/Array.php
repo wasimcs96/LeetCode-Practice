@@ -1387,23 +1387,26 @@ echo "Spiral: " . implode(", ", spiralOrder($matrix)) . "\n";
 // TC: O(n)  |  SC: O(n)
 // ============================================================
 
-function subarraySum(array $nums, int $k): int {
-    $hash       = [0 => 1];  // Prefix sum -> frequency; base case
-    $sum        = 0;
-    $ansCounter = 0;
+$length = count($nums);
+        $ansCounter = 0;
+        $hash [0]= 1;
+        $sum = 0;
 
-    foreach ($nums as $num) {
-        $sum += $num;
+        //rem = sum-k => sum = rem + k
+        //<-------------------------->Sum (sum till i) ->set sum in hashmap
+        //<------->rem (sum till i) ->check rem in haspmap  -> if rem exists in hashmap then add count of rem in hashmap to answer counter because it means there is a subarray from index after rem to current index i which sums to k.    
+        //         <----------------->k  -> subarray sum from rem+1 to i = k
+        // If rem exists in hashmap then add count of rem in hashmap to answer counter because it means there is a subarray from index after rem to current index i which sums to k.
 
-        // If (sum-k) appeared before, those subarrays sum to k
-        $ansCounter += $hash[$sum - $k] ?? 0;
-
-        // Record current prefix sum
-        $hash[$sum] = ($hash[$sum] ?? 0) + 1;
-    }
-
-    return $ansCounter;
-}
+        for($i = 0; $i < $length; $i++){
+          $sum += $nums[$i];
+          $removal = $sum-$k;
+          // If the removal (sum-k) exists in the hash map, it means there is a subarray that sums to k ending at index i. We add the count of such subarrays (hash[removal]) to our answer counter.
+          $ansCounter += $hash[$removal] ?? 0;
+          // We then update the hash map to include the current prefix sum. If this prefix sum has been seen before, we increment its count; otherwise, we initialize it to 1.
+          $hash[$sum] = ($hash[$sum] ?? 0) + 1;
+        }
+        return $ansCounter;
 
 // Dry Run  ->  $nums = [1,1,1], k=2
 // init: hash={0:1}, sum=0
@@ -1418,6 +1421,21 @@ echo "Subarray sum count: " . subarraySum([1, 1, 1], 2) . "\n";  // 2
 // ============================================================
 // 25. LC 118 -- PASCAL'S TRIANGLE
 // ============================================================
+//Brute-force approach: Compute each element using factorials: C(row, col) = row! / (col! * (row-col)!).
+    $arr = [[1]];
+    $i = 1;
+    while($i < $numRows){
+        $j = 0;
+        while($j <= $i){
+            $previousRowSameIndexValue = $arr[$i-1][$j] ?? 0;
+            $previousRowPreviousIndexValue = $arr[$i-1][$j-1] ?? 0;
+            $arr[$i][$j] = $previousRowSameIndexValue + $previousRowPreviousIndexValue;
+            $j++;
+        }
+        $i++;
+    }
+    return $arr;
+
 // Intuition: Each element = C(row, col) = C(row, col-1) * (row-col) / col.
 //   Compute row values using the multiplicative formula to avoid
 //   recomputing factorials.  Each row starts and ends with 1.
