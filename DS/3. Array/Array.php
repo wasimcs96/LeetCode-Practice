@@ -305,7 +305,8 @@ function findUnion(array $arr1, array $arr2): array {
 
     while ($i < $count1 && $j < $count2) {
         if ($arr1[$i] < $arr2[$j]) {
-            $uni[$arr1[$i]] = $arr1[$i];  // Key = value -> auto dedup
+            $uni[$arr1[$i]] = $arr1[$i];  // Key = value -> auto dedup 
+            //IMP => use value as index $uni["$arr1[$i]"] 
             $i++;
         } elseif ($arr1[$i] > $arr2[$j]) {
             $uni[$arr2[$j]] = $arr2[$j];
@@ -388,6 +389,23 @@ function missingNumber(array $nums): int {
 // missing = 6-4 = 2  ok
 
 echo "Missing: " . missingNumber([3, 0, 1]) . "\n";  // 2
+
+//https://www.geeksforgeeks.org/dsa/find-the-missing-number/
+//Intuition:  Using XOR Operation - O(n) Time and O(1) Space
+//XOR of a number with itself is 0 i.e. x ^ x = 0 and the given array arr[] has numbers in range [1, n]. This means that the result of XOR of first n natural numbers with the XOR of all the array elements will be the missing number. To do so, calculate XOR of first n natural numbers and XOR of all the array arr[] elements, and then our result will be the XOR of both the resultant values
+$arr1 = [1,2,3,4,5,7,8,9,10];
+
+$xor1 = 0;
+$xor2 = 0;
+
+$naturalNumbers = count($arr1)+1;
+for($i=1; $i<=$naturalNumbers; $i++){
+    $xor1 ^= $i;
+}
+for($i=0; $i<$naturalNumbers-1; $i++){
+    $xor2 ^= $arr1[$i];
+}
+echo $xor1 ^ $xor2;
 
 
 // ============================================================
