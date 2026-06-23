@@ -539,23 +539,6 @@ echo "Longest subarray (sum=15): " . longestSubarraySumK([10, 5, 2, 7, 1, 9], 15
 // 12b. LONGEST SUBARRAY SUM K -- SLIDING WINDOW (only +ve numbers)
 // ============================================================
 
-//Approach -1 Using Hasmap
-$arr = [2,6,5,8,11]; $target = 14;
-$arrLength = count($arr);
-$i = 0; $j = $arrLength-1;
-
-$hasMapArr = []; $sum = 0; $maxLength = 0;
-foreach($arr as $value){
-    $hasMapArr[$value] = $value;
-}
-while($i <= $j){
-    $rem = $target - $arr[$i];
-    if(isset($hasMapArr[$rem])){
-        echo "Found Pair: ({$arr[$i]}, {$rem})\n";
-    }
-    $i++;
-}
-
 // Intuition: Expand right pointer; shrink left when sum > k.
 //   Only valid for non-negative arrays.
 // TC: O(n)  |  SC: O(1)
@@ -586,6 +569,25 @@ function longestSubarrayPositive(array $nums, int $k): int {
 // ============================================================
 // 13. LC 1 -- TWO SUM
 // ============================================================
+
+
+//Approach -1 Using Hasmap
+$arr = [2,6,5,8,11]; $target = 14;
+$arrLength = count($arr);
+$i = 0; $j = $arrLength-1;
+
+$hasMapArr = []; $sum = 0; $maxLength = 0;
+foreach($arr as $value){
+    $hasMapArr[$value] = $value;
+}
+while($i <= $j){
+    $rem = $target - $arr[$i];
+    if(isset($hasMapArr[$rem])){
+        echo "Found Pair: ({$arr[$i]}, {$rem})\n";
+    }
+    $i++;
+}
+
 // Intuition: For each element x, check if (target - x) was seen.
 //   Store target-nums[i] -> i in hashmap; if nums[j] exists in map,
 //   we found the pair.
@@ -1028,6 +1030,21 @@ function reverseArr(array &$arr, int $start, int $end): void {
     }
 }
 
+
+//===================
+// Leaders in an Array
+
+$nums = [10, 22, 12, 3, 0, 6];
+$ans = [$nums[count($nums)-1]]; $max = $nums[count($nums)-1];
+for($i = count($nums)-2 ; $i >= 0; $i--){
+    if($nums[$i] > $max ){
+        $ans[] = $nums[$i];
+        $max = $nums[$i];
+    }
+    
+}
+print_r($ans);
+
 // ============================================================
 // 20. LC 128 -- LONGEST CONSECUTIVE SEQUENCE
 // ============================================================
@@ -1469,7 +1486,7 @@ function generate(int $numRows): array {
         $row[0]  = $val;
 
         for ($j = 1; $j < $i; $j++) {
-            $val     = (int) ($val * ($i - $j) / $j);  // C(i-1, j) formula
+            $val     = (int) ($val * ($i - $j) / $j);  // C(i-1, j) formula to compute next value based on previous value in the same row 
             $row[$j] = $val;
         }
 
@@ -1524,7 +1541,7 @@ function majorityElementII(array $nums): array {
     $count1 = $count2 = 0;
     foreach ($nums as $num) {
         if ($num === $el1) $count1++;
-        if ($num === $el2) $count2++;
+        elseif ($num === $el2) $count2++;
     }
 
     $ans = [];
@@ -1594,6 +1611,50 @@ function threeSum(array $nums): array {
 // Output: [[-1,-1,2],[-1,0,1]]  ok
 
 print_r(threeSum([-1, 0, 1, 2, -1, -4]));
+
+
+// ============================================================
+// 18. 4Sum
+// ============================================================
+// Intuition: Sort the array, fix the first element with outer loop,
+// 
+// ============================================================
+
+function fourSum(array $nums, int $target) {
+        $n = count($nums);
+        $i = 0;
+        sort($nums); $ans = [];
+        for($i=0;$i<$n;$i++){
+            if($i>0 && $i<$n && $nums[$i] === $nums[$i-1]) continue;
+            
+            for($j=$i+1;$j<$n;$j++){
+                if($j>$i+1 && $j<$n && $nums[$j] === $nums[$j-1]) continue;
+
+                $k = $j+1;
+                $l = $n-1;
+                while($k<$l){
+                    if($nums[$i]+$nums[$j]+$nums[$k]+$nums[$l] == $target){
+                        $set = [$nums[$i], $nums[$j], $nums[$k], $nums[$l]];
+                        $ans[] = $set;
+                        $k++;
+                        $l--;
+
+                        while ($k < $l && $nums[$k] === $nums[$k - 1]) $k++;
+                        while ($k < $l && $nums[$l] === $nums[$l + 1]) $l--;
+                    }elseif($nums[$i]+$nums[$j]+$nums[$k]+$nums[$l] > $target){
+                        $l--;
+                    }else{
+                        $k++;
+                    }
+                }
+            }
+        }
+        return array_values($ans);
+    }
+
+$nums = [1,0,-1,0,-2,2];
+$target = 0; 
+print_r(fourSum($nums, $target));
 
 
 // ============================================================

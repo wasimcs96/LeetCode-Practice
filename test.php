@@ -1,22 +1,35 @@
 <?php
+$weights = [1,2,3,1,1]; $days = 4;
+$ans = shipWithinDays($weights, $days);
+echo $ans;
 
-$nums = [2, 1, 1, 2, 1, 1, 2]; 
+function shipWithinDays(array $weights, $days) {
+    $minWeights = max($weights);
+    $maxWeights = array_sum($weights);
 
-$high = count($nums)-1; $low = 0; $maxElement = 0; $maxCount = 0;
-while($low <= $high){
-    if($maxCount == 0){
-        $maxElement = $nums[$low];
-        $maxCount = 1;
+    while($minWeights <= $maxWeights){
+        $midWeights = (int)(($minWeights + $maxWeights)/2);
+        $shippingDays = getMinimalWeight($weights, $midWeights);
+        if($shippingDays <= $days){
+            $maxWeights = $midWeights - 1;
+        }else{
+            $minWeights = $midWeights + 1;
+        }
     }
-    elseif($maxElement == $nums[$low]){
-        $maxCount++;
-    }else{
-        $maxCount--;
-    }
-    
-
-    $low++;
-    
+    return $minWeights;
 }
 
-echo $maxElement;
+function getMinimalWeight(array $weights, int $midWeights){
+    $cnt = 0; $days = 1;
+    for($i=0;$i<count($weights); $i++){
+        if($cnt + $weights[$i] > $midWeights){
+            $days++;
+            $cnt = $weights[$i];
+        }else{
+            $cnt += $weights[$i];
+        }
+    }
+    return $days;
+}
+
+
