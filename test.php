@@ -1,35 +1,33 @@
 <?php
-$weights = [1,2,3,1,1]; $days = 4;
-$ans = shipWithinDays($weights, $days);
-echo $ans;
 
-function shipWithinDays(array $weights, $days) {
-    $minWeights = max($weights);
-    $maxWeights = array_sum($weights);
+function characterReplacement($s, $k) {
+    $length = strlen($s);
+    if($length == 0 || $length == 1) return $length;
 
-    while($minWeights <= $maxWeights){
-        $midWeights = (int)(($minWeights + $maxWeights)/2);
-        $shippingDays = getMinimalWeight($weights, $midWeights);
-        if($shippingDays <= $days){
-            $maxWeights = $midWeights - 1;
-        }else{
-            $minWeights = $midWeights + 1;
+    $left = $right = 0; $maxLength = 0;  $chrHashCounter = []; $maxFreq = 0;
+
+    for($right; $right < $length; $right++){
+        if(isset($chrHashCounter[$s[$right]])) $chrHashCounter[$s[$right]]++;
+        else $chrHashCounter[$s[$right]] = 1;
+
+        $maxFreq = max($chrHashCounter[$s[$right]], $maxFreq);
+
+        while(($right - $left + 1) - $maxFreq > $k){
+            $leftChr = $s[$left];
+            $chrHashCounter[$leftChr]--;
+            if($chrHashCounter[$leftChr] == 0) unset($chrHashCounter[$leftChr]);
+            $left++;
         }
+
+        $windowLength = $right - $left + 1;
+        $maxLength = max($maxLength, $windowLength);
     }
-    return $minWeights;
+    return $maxLength;
 }
 
-function getMinimalWeight(array $weights, int $midWeights){
-    $cnt = 0; $days = 1;
-    for($i=0;$i<count($weights); $i++){
-        if($cnt + $weights[$i] > $midWeights){
-            $days++;
-            $cnt = $weights[$i];
-        }else{
-            $cnt += $weights[$i];
-        }
-    }
-    return $days;
-}
 
+$fruits = "AABABBA"; $k = 1;
+echo characterReplacement($fruits, $k);
+
+?>
 

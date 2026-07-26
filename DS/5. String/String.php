@@ -12,6 +12,51 @@
 //     build results in a variable rather than modifying in-place
 // ============================================================
 
+//Remove Outermost Parentheses
+function removeOuterParentheses($s) {
+        // String to store the final result after removing outermost parentheses
+        $ans = "";
+
+        // Tracks the number of currently open '(' parentheses
+        // It increases when we see '(' and decreases when we see ')'
+        $openParenthesisCount = 0;
+
+        // Traverse each character of the input string
+        for ($i = 0; $i < strlen($s); $i++) {
+
+            // Get the current character
+            $str = $s[$i];
+
+            // If the current character is an opening parenthesis
+            if ($str == "(") {
+
+                // Increase the count because a new '(' is encountered
+                $openParenthesisCount++;
+
+                // If count is NOT 1, it means this is NOT the outermost '('
+                // So, keep it in the answer
+                if ($openParenthesisCount != 1) {
+                    $ans .= $str;
+                }
+
+            } else {
+
+                // Current character is ')'
+                // Decrease the count because one '(' is now closed
+                $openParenthesisCount--;
+
+                // If count is NOT 0, it means this is NOT the outermost ')'
+                // So, keep it in the answer
+                if ($openParenthesisCount != 0) {
+                    $ans .= $str;
+                }
+            }
+        }
+
+        // Return the string after removing all outermost parentheses
+        return $ans;
+    }
+
 
 // ============================================================
 // 1. REVERSE WORDS IN A STRING (LeetCode 151)
@@ -111,6 +156,55 @@ echo "Reverse Words 'a':                   '" . reverseWords("a")               
 
 function largestOddNumber(string $num): string
 {
+
+    // Remove leading and trailing spaces
+    $num = trim($num);
+
+    // Find length of the string
+    $stringLength = strlen($num);
+
+    // If string is empty, nothing to process
+    if ($stringLength == 0) return "";
+
+    // Stores index of the last odd digit.
+    // -1 means no odd digit found yet.
+    $maxOddNumberLastDigit = -1;
+
+    // Traverse from right to left because
+    // we need the RIGHTMOST odd digit.
+    for ($i = $stringLength - 1; $i >= 0; $i--) {
+        // Convert character into number implicitly
+        // and check if it is odd.
+        if ($num[$i] % 2 != 0) {
+            // Save index of odd digit
+            $maxOddNumberLastDigit = $i;
+
+            // No need to continue.
+            // This is the largest possible odd substring.
+            break;
+        }
+    }
+
+    // Final answer
+    $ans = "";
+
+    // Copy characters from beginning
+    // until the last odd digit.
+    for ($i = 0; $i <= $maxOddNumberLastDigit; $i++) {
+        // Skip leading zeros.
+        // Example:
+        // "000123" -> "123"
+        if ($num[$i] == '0' && $ans == "")
+            continue;
+
+        // Append current digit
+        $ans .= $num[$i];
+    }
+
+    return $ans;
+
+
+    //Similer Sort version
     $high = strlen($num) - 1; // Start from the rightmost digit
 
     // Scan right-to-left until an odd digit is found
@@ -131,6 +225,329 @@ echo "Largest Odd '35619':    '" . largestOddNumber('35619')   . "'\n"; // '3561
 echo "Largest Odd '4206':     '" . largestOddNumber('4206')    . "'\n"; // ''  (all even digits)
 echo "Largest Odd '5':        '" . largestOddNumber('5')       . "'\n"; // '5'
 
+$strs = ["dog","racecar","car"];
+echo longestCommonPrefix($strs); echo "\n";
+
+
+//Longest Common Prefix
+function longestCommonPrefix($strs): string {
+    // If array is empty, there is no common prefix.
+    if (empty($strs))
+        return "";
+
+    // If only one string exists,
+    // that string itself is the answer.
+    if (count($strs) == 1)
+        return $strs[0];
+
+    // Sort strings in lexicographical (dictionary) order.
+    sort($strs);
+
+    // Smallest string after sorting.
+    $first = $strs[0];
+
+    // Largest string after sorting.
+    $last = $strs[count($strs) - 1];
+
+    // Stores the final common prefix.
+    $commonPrefix = "";
+
+    // We only compare up to the length
+    // of the smaller string.
+    $minLength = min(strlen($first), strlen($last));
+
+    // Compare characters one by one.
+    for ($i = 0; $i < $minLength; $i++) {
+
+        // If characters match,
+        // add them into answer.
+        if ($first[$i] === $last[$i]) {
+
+            $commonPrefix .= $first[$i];
+
+        } else {
+
+            // First mismatch found.
+            // No more common prefix exists.
+            break;
+        }
+    }
+
+    return $commonPrefix;
+}
+
+//205. Isomorphic Strings
+
+function isIsomorphic($s, $t) {
+        $sLength = strlen($s);
+        $tLength = strlen($t);
+
+        if($sLength != $tLength) return false;
+
+        for($i=0;$i<$sLength;$i++){
+            $sChar = $s[$i];
+            $tChar = $t[$i];
+            // Find the first occurrence of each character.
+            // If first occurrence positions differ,
+            // mapping is inconsistent.
+            if(strpos($s, $sChar) != strpos($t, $tChar)){
+                return false;
+            }
+
+        }
+        return true;
+
+        //Solution 2
+        // $strMap1 = $strMap2 = array();
+        // $sLength = strlen($s);
+        // $tLength = strlen($t);
+        // if($sLength != $tLength) return false;
+
+        // for($i = 0; $i < $sLength; $i++){
+        //     if(isset($strMap1[$s[$i]])){
+        //     if($strMap1[$s[$i]] != $t[$i]) {
+        //         return false;
+        //     }
+        //     }else{
+        //         $strMap1[$s[$i]] = $t[$i];
+        //     }
+
+        //     if(isset($strMap2[$t[$i]])){
+        //     if($strMap2[$t[$i]] != $s[$i]) {
+        //         return false;
+        //     }
+        //     }else{
+        //         $strMap2[$t[$i]] = $s[$i];
+        //     }
+        // }
+        // return true;
+    }
+
+
+//796. Rotate String
+
+function rotateString($s, $goal) {
+    $sLength = strlen($s);
+    $goalLength = strlen($goal);
+
+    if($sLength != $goalLength) return false;
+
+    $concatenatedString = $s . $s;
+
+    for($i=0;$i<2*$sLength;$i++){
+        $tempString = "";
+        for($j=$i;$j<$sLength+$i;$j++){
+            $tempString .= $concatenatedString[$j];
+        }
+        if($tempString == $goal){
+            return true;
+        }
+    }
+    return false;
+
+    //Another Approch
+    // $rotation = 1;
+    //     while($rotation <= $sLength){  
+    //       $newStr = substr($s, $rotation, $sLength).substr($s, 0, $rotation);
+    //       if($newStr == $goal) return true;
+    //       $rotation++;
+    //     }
+
+    //Another Approch
+    //$s .= $s; //abc => abcabc and gaol=cba , bca exits in abcabc
+    //return strpos($s,$goal) !== false; //u can use for loop to get bca in string
+
+    //Another Approch
+    // $array = str_split($s);
+
+    // for ($i = 0; $i < count($array); $i++) {
+    //         $first_letter = array_shift($array);
+
+    //         $array[] = $first_letter;
+
+    //         if (implode($array) === $goal) {
+    //             return true;
+    //         }
+    //     }
+//242. Valid Anagram
+    function isAnagram($s, $t) {
+        //sort both string and compare both char one by one
+        //OR use hasmap and store first string chr and unset for second string 
+        $sLength = strlen($s);
+        $tLength = strlen($t);
+
+        if($sLength != $tLength) return false;
+
+        $hashMap = array_fill(0,26,0);
+        
+        for($i=0;$i<$sLength;$i++){
+            $chr = $s[$i];
+            $hashMap[ord($chr) - ord('a')]++;
+        }
+        for($i=0;$i<$tLength;$i++){
+            $chr = $t[$i];
+            $hashMap[ord($chr) - ord('a')]--;
+        }
+        for($i=0;$i<26;$i++){
+            if($hashMap[$i] != 0) return false;
+        }
+
+        return true;
+    }
+
+
+//Sort characters by frequency
+$s = "tree";
+print_r(frequencySort($s)); // Output: "eert" or "eetr"
+function frequencySort($s)
+{
+    // Find length of the string
+    $sLength = strlen($s);
+
+    // If string contains 0 or 1 character,
+    // it is already sorted.
+    if ($sLength <= 1) {
+        return $s;
+    }
+
+    // ---------------------------------------
+    // Step 1:
+    // Count frequency of every character.
+    // ---------------------------------------
+    //
+    // Example:
+    // "tree"
+    //
+    // Frequency Map
+    // t => 1
+    // r => 1
+    // e => 2
+    //
+    $frequencyMap = [];
+
+    foreach (str_split($s) as $char) {
+
+        // If character appears first time
+        if (!isset($frequencyMap[$char])) {
+
+            $frequencyMap[$char] = 1;
+
+        } else {
+
+            // Increase frequency
+            $frequencyMap[$char]++;
+        }
+    }
+
+    // ---------------------------------------
+    // Step 2:
+    // Reverse the mapping.
+    //
+    // Character -> Count
+    //
+    // becomes
+    //
+    // Count -> List of Characters
+    // ---------------------------------------
+
+    $finalHashMap = [];
+
+    foreach ($frequencyMap as $char => $count) {
+
+        // Multiple characters may have
+        // the same frequency.
+        $finalHashMap[$count][] = $char;
+    }
+
+    /*
+        Example
+
+        Frequency Map
+
+        t => 1
+        r => 1
+        e => 2
+
+        Final Hash Map
+
+        1 => [t,r]
+        2 => [e]
+    */
+
+    // Sort frequencies in descending order.
+    //
+    // Example:
+    //
+    // Before
+    // 1 => [t,r]
+    // 2 => [e]
+    //
+    // After
+    // 2 => [e]
+    // 1 => [t,r]
+    //
+    krsort($finalHashMap);
+
+    // Final answer
+    $answer = "";
+
+    // Traverse frequencies from highest to lowest.
+    foreach ($finalHashMap as $count => $chars) {
+
+        // If two characters have same frequency,
+        // sort them alphabetically.
+        sort($chars);
+
+        foreach ($chars as $char) {
+
+            // Repeat current character
+            // exactly 'count' times.
+            $j = $count;
+
+            while ($j--) {
+
+                $answer .= $char;
+            }
+        }
+    }
+
+    return $answer;
+}
+//Roman to Integer
+$s = "MCMXCIV";
+echo romanToInt($s);
+function romanToInt($s) {
+    $romanMap = [
+        'I' => 1,
+        'V' => 5,
+        'X' => 10,
+        'L' => 50,
+        'C' => 100,
+        'D' => 500,
+        'M' => 1000,
+        'IV' => 4,
+        'IX' => 9,
+        'XL' => 40,
+        'XC' => 90,
+        'CD' => 400,
+        'CM' => 900
+    ];
+
+    $total = 0;
+    $i = 0;
+    while ($i < strlen($s)) {
+        if($i+1 < strlen($s) && isset($romanMap[$s[$i].$s[$i+1]])){
+            $total += $romanMap[$s[$i].$s[$i+1]];
+            $i += 2;
+        }
+        else {
+            $total += $romanMap[$s[$i]];
+            $i++;
+        }
+    }
+
+    return $total;
+}
 
 // ============================================================
 // 3. STRING TO INTEGER — atoi  ITERATIVE  (LeetCode 8)
@@ -168,49 +585,140 @@ echo "Largest Odd '5':        '" . largestOddNumber('5')       . "'\n"; // '5'
 
 function myAtoi(string $s): int
 {
-    if ($s === '') return 0;
+    // If the input string is empty,
+    // return 0.
+    if ($s === '') {
+        return 0;
+    }
 
-    $INT_MAX    =  2147483647;
-    $INT_MIN    = -2147483648;
+    // 32-bit signed integer limits.
+    $INT_MAX = 2147483647;
+    $INT_MIN = -2147483648;
+
+    // Indicates whether the number is negative.
     $isNegative = false;
-    $result     = 0;
-    $i          = 0;
-    $n          = strlen($s);
 
-    // Step 1: Skip leading whitespace
+    // Stores the converted integer.
+    $result = 0;
+
+    // Pointer used to traverse the string.
+    $i = 0;
+
+    // Length of the string.
+    $n = strlen($s);
+
+    // ----------------------------------------------------
+    // Step 1: Skip only leading whitespaces.
+    //
+    // Example:
+    // "    -42"
+    //       ↑
+    // Move pointer until first non-space character.
+    // ----------------------------------------------------
     while ($i < $n && $s[$i] === ' ') {
         $i++;
     }
 
-    // Step 2: Read optional sign (only one sign character is consumed)
+    // ----------------------------------------------------
+    // Step 2: Check for optional '+' or '-'.
+    //
+    // Example:
+    // "-42"
+    //  ^
+    //
+    // If '-' is found,
+    // remember that the final answer is negative.
+    // ----------------------------------------------------
     if ($i < $n && ($s[$i] === '+' || $s[$i] === '-')) {
+
         $isNegative = ($s[$i] === '-');
+
+        // Move to the first digit.
         $i++;
     }
 
-    // Step 3: Read digits and build the integer
+    // ----------------------------------------------------
+    // Step 3: Read consecutive digits.
+    // Stop automatically when a non-digit is found.
+    // ----------------------------------------------------
     while ($i < $n && $s[$i] >= '0' && $s[$i] <= '9') {
-        $digit = (int)$s[$i]; // Convert character '0'–'9' to integer 0–9
 
-        // --- Overflow check BEFORE updating result ---
+        // Convert current character into integer.
+        //
+        // '5' -> 5
+        // '9' -> 9
+        $digit = (int)$s[$i];
+
+        // ------------------------------------------------
+        // Overflow Check
+        // ------------------------------------------------
+        //
+        // Suppose:
+        //
+        // result = 214748364
+        //
+        // Next digit = 8
+        //
+        // If we calculate:
+        //
+        // result * 10 + digit
+        //
+        // it becomes
+        //
+        // 2147483648
+        //
+        // which exceeds INT_MAX.
+        //
+        // Therefore, we must check BEFORE multiplying.
+        //
+
         if ($result > intdiv($INT_MAX, 10)) {
-            // Any further digit would push past INT_MAX or past |INT_MIN|
-            return $isNegative ? $INT_MIN : $INT_MAX;
+
+            return $isNegative
+                ? $INT_MIN
+                : $INT_MAX;
         }
 
-        if ($result === intdiv($INT_MAX, 10)) {
-            // result * 10 is exactly 2147483640; check if the new digit fits
-            if ($isNegative && $digit > 8) return $INT_MIN; // |INT_MIN| = 2147483648
-            if (!$isNegative && $digit > 7) return $INT_MAX; // INT_MAX  = 2147483647
+        // If result is exactly
+        // 214748364
+        //
+        // then only the last digit matters.
+        if ($result == intdiv($INT_MAX, 10)) {
+
+            // Negative numbers may end with 8.
+            //
+            // -2147483648
+            if ($isNegative && $digit > 8) {
+                return $INT_MIN;
+            }
+
+            // Positive numbers may end with 7.
+            //
+            // 2147483647
+            if (!$isNegative && $digit > 7) {
+                return $INT_MAX;
+            }
         }
 
-        $result = $result * 10 + $digit; // Safe to update
+        // Safe to append the digit.
+        //
+        // Example
+        //
+        // result = 42
+        //
+        // digit = 5
+        //
+        // result = 425
+        $result = $result * 10 + $digit;
+
         $i++;
     }
-    // Step 4: Non-digit encountered (or end of string) → stop automatically
 
-    // Step 5: Apply sign and return
-    return $isNegative ? -$result : $result;
+    // Apply sign.
+    return $isNegative
+        ? -$result
+        : $result;
+
 }
 
 // --- Run ---
@@ -327,7 +835,246 @@ echo "atoi recursive '   -42':          " . myAtoiRecursive('   -42')          .
 echo "atoi recursive '4193 with words': " . myAtoiRecursive('4193 with words') . "\n"; //  4193
 echo "atoi recursive '-91283472332':    " . myAtoiRecursive('-91283472332')    . "\n"; // -2147483648
 
+// Function to count substrings having AT MOST K distinct characters.
+function atMostKDistinct($s, $k)
+{
+    // If k becomes negative,
+    // no valid substring can exist.
+    if ($k < 0) {
+        return 0;
+    }
 
+    // Left pointer of the sliding window.
+    $left = 0;
+
+    // Stores the final count.
+    $result = 0;
+
+    // Frequency map:
+    // character => frequency
+    $freqMap = [];
+
+    $n = strlen($s);
+
+    // Expand the window using the right pointer.
+    for ($right = 0; $right < $n; $right++) {
+
+        $char = $s[$right];
+
+        // Add the current character into the frequency map.
+        if (!isset($freqMap[$char])) {
+            $freqMap[$char] = 1;
+        } else {
+            $freqMap[$char]++;
+        }
+
+        // If distinct characters become greater than K,
+        // shrink the window from the left.
+        while (count($freqMap) > $k) {
+
+            $leftChar = $s[$left];
+
+            // Remove one occurrence of the left character.
+            $freqMap[$leftChar]--;
+
+            // If frequency becomes zero,
+            // remove the character completely.
+            if ($freqMap[$leftChar] == 0) {
+                unset($freqMap[$leftChar]);
+            }
+
+            // Move the left pointer.
+            $left++;
+        }
+
+        // Every substring ending at 'right'
+        // and starting between
+        // left...right
+        // is valid.
+        //
+        // Count them.
+        echo $k."== ".$right."_".$left."\n";
+        $result += ($right - $left + 1);
+    }
+
+    return $result;
+}
+
+
+// Function to count substrings having EXACTLY K distinct characters.
+function countSubstrings($s, $k)
+{
+    return atMostKDistinct($s, $k)
+         - atMostKDistinct($s, $k - 1);
+}
+
+$s = "pqpqs";
+$k = 2;
+echo countSubstrings($s, $k);
+
+
+
+function longestPalindrome($s)
+{
+    $n = strlen($s);
+
+    // If the string has 0 or 1 character, it is already a palindrome.
+    if ($n <= 1) {
+        return $s;
+    }
+
+    // Start index of the longest palindrome.
+    $start = 0;
+
+    // Length of the longest palindrome.
+    $maxLength = 1;
+
+    // Try every character as the center.
+    for ($i = 0; $i < $n; $i++) {
+
+        // Case 1: Odd-length palindrome (center at i)
+        $this->expandAroundCenter($s, $i, $i, $start, $maxLength);
+
+        // Case 2: Even-length palindrome (center between i and i+1)
+        $this->expandAroundCenter($s, $i, $i + 1, $start, $maxLength);
+    }
+
+    // Return the longest palindrome found.
+    return substr($s, $start, $maxLength);
+}
+
+/**
+* Expand from the given center and update the longest palindrome.
+*/
+public function expandAroundCenter($s, $left, $right, &$start, &$maxLength)
+{
+    $n = strlen($s);
+
+    // Expand while characters are equal.
+    while ($left >= 0 && $right < $n && $s[$left] == $s[$right]) {
+        $left--;
+        $right++;
+    }
+
+    /*
+    * We expanded one step too far.
+    *
+    * Example:
+    *
+    * String: "abba"
+    *
+    * left = -1
+    * right = 4
+    *
+    * Actual palindrome length:
+    *
+    * right - left - 1
+    */
+    $currentLength = $right - $left - 1;
+
+    // Update answer if we found a longer palindrome.
+    if ($currentLength > $maxLength) {
+        $maxLength = $currentLength;
+        $start = $left + 1;
+    }
+}
+
+        $s = "ababad";
+echo longestPalindrome($s);
+
+
+
+function beautySum($s) {
+        $length = strlen($s);
+        if($length == 0 || $length == 1) return 0;
+
+        $freqMap = [];
+        $result = 0;
+        
+        for($i=0;$i<$length;$i++){
+            $freqMap = [];
+            for($j=$i;$j<$length;$j++){
+                $chr = $s[$j];
+
+                if(isset($freqMap[$chr])) $freqMap[$chr]++;
+                else $freqMap[$chr] = 1;
+
+                $result += max($freqMap) - min($freqMap);
+            }
+        }
+
+        return $result;
+        
+    }
+
+
+    function reverseWord($s)
+    {
+        // Remove leading and trailing spaces
+        $s = trim($s);
+
+        // Find the length of the trimmed string
+        $stringLength = strlen($s);
+
+        // If the string is empty after trimming, return an empty string
+        if ($stringLength == 0) {
+            return "";
+        }
+
+        // Stores the current word while traversing the string
+        $tempWord = "";
+
+        // Stores the final answer in reverse order
+        $finalStr = "";
+
+        // Traverse each character of the string
+        for ($i = 0; $i < $stringLength; $i++) {
+
+            // Get current character
+            $str = $s[$i];
+
+            // If current character is NOT a space,
+            // keep building the current word
+            if ($str != ' ') {
+
+                $tempWord .= $str;
+
+            } else {
+
+                // Remove extra spaces from the current word
+                $tempWord = trim($tempWord);
+
+                // Ignore consecutive spaces
+                if (!empty($tempWord)) {
+
+                    // Insert current word at the beginning
+                    if (!empty($finalStr)) {
+                        $finalStr = $tempWord . " " . $finalStr;
+                    } else {
+                        // First word
+                        $finalStr = $tempWord;
+                    }
+                }
+
+                // Reset for the next word
+                $tempWord = "";
+            }
+        }
+
+        // Process the last word because the loop ends without a trailing space
+        $tempWord = trim($tempWord);
+
+        if (!empty($tempWord)) {
+            if (!empty($finalStr)) {
+                $finalStr = $tempWord . " " . $finalStr;
+            } else {
+                $finalStr = $tempWord;
+            }
+        }
+
+        // Return reversed string
+        return $finalStr;
+    }
 // ============================================================
 // COMPARISON SUMMARY
 // ============================================================

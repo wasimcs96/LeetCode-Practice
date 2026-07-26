@@ -831,6 +831,131 @@ echo "Split Array [1,2,3,4,5] k=2: " . splitArrayLargestSum([1,2,3,4,5], 2) . "\
 echo "Split Array [1,2,3,4,5] k=3: " . splitArrayLargestSum([1,2,3,4,5], 3) . "\n"; // 6
 
 
+//Minimise Maximum Distance between Gas Stations
+class GasStationSolver
+{
+
+    /**
+     * @param Integer[] $arr
+     * @param int $k
+     * @return Float
+     */
+    //Brute Force Approach
+    public function minimiseMaxDistance(array $arr, int $k): float
+    {
+        $length = count($arr);
+        $hashMap = array_fill(0, $length-1, 0);
+        //print_r($hashMap);
+        for($i=0;$i<$k;$i++){
+            $maxSectionInd = -1;
+            $maxSectionLength = -1.0;
+            for($j=0;$j<$length-1;$j++){
+                $diff = $arr[$j+1] - $arr[$j];
+                $sectionLength = $diff / ($hashMap[$j] + 1);
+
+                if($sectionLength > $maxSectionLength){
+                    $maxSectionLength = $sectionLength;
+                    $maxSectionInd = $j;
+                }
+            }
+            $hashMap[$maxSectionInd]++;
+        }
+        $maxDistance = -1;
+        for($j=0;$j<$length-1;$j++){
+            $sectionDistance = $arr[$j+1] - $arr[$j];
+            $distanceBetweenStation = $sectionDistance / ($hashMap[$j] + 1);
+
+            $maxDistance = max($distanceBetweenStation, $maxDistance);
+        }
+
+        return $maxDistance;
+
+    }
+
+    //Optimal
+    public static function minimiseMaxDistanceV2(array $arr, int $k): float
+    {
+        $n = count($arr);
+
+        // Number of extra gas stations added in each segment
+        $howMany = array_fill(0, $n - 1, 0);
+
+        // Max Heap
+        $pq = new SplPriorityQueue();
+
+        // Extract both priority and data
+        $pq->setExtractFlags(SplPriorityQueue::EXTR_BOTH);
+
+        // Insert all initial segments
+        for ($i = 0; $i < $n - 1; $i++) {
+            $distance = $arr[$i + 1] - $arr[$i];
+
+            // data = index, priority = section length
+            $pq->insert($i, $distance);
+        }
+        //print_r($pq);
+        // Place k gas stations
+        for ($station = 0; $station < $k; $station++) {
+
+            // Largest segment
+            $top = $pq->extract();
+
+            $idx = $top['data'];
+
+            // Add one station in this segment
+            $howMany[$idx]++;
+
+            $totalDistance = $arr[$idx + 1] - $arr[$idx];
+            
+            $newLength = floatval($totalDistance) / floatval($howMany[$idx] + 1);
+
+            // Push updated segment back into heap
+            
+            $pq->insert($idx, $newLength);
+        }
+        //print_r($pq);
+
+        // Top of heap contains the maximum remaining section length
+        return $pq->current()['priority'];
+    }
+
+    public function test(array $arr, int $k): float{
+        $length = count($arr);
+        $howMany = array_fill(0,$length,0);
+
+        $pq = new SplPriorityQueue();
+        $pq->SetExtractFlags(3);
+
+        for($i=0;$i<$length-1;$i++){
+            $distance = $arr[$i+1] - $arr[$i];
+            $pq->insert($i, $distance);
+        }
+        for($i=0;$i<$k;$i++){
+            $top = $pq->extract();
+            $idx = $top['data'];
+
+            $howMany[$idx]++;
+            $distance = $arr[$idx+1] - $arr[$idx];
+            $newLength = floatval($distance) / floatval($howMany[$idx]+1);
+
+            $pq->insert($idx, $newLength);
+        }
+        return $pq->current()['priority'];
+    }
+
+
+}
+
+//Example usage
+$arr = [1,13,17,23];
+$k = 5;
+
+$solver = new GasStationSolver();
+$ans = $solver->test($arr, $k);
+
+echo "The answer is: " . $ans . PHP_EOL;
+
+
 // ============================================================
 // 10. FIND ROW WITH MAXIMUM NUMBER OF 1s (Sorted 2D Matrix)
 // ============================================================
