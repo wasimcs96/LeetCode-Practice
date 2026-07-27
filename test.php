@@ -1,33 +1,36 @@
 <?php
 
-function characterReplacement($s, $k) {
-    $length = strlen($s);
-    if($length == 0 || $length == 1) return $length;
+function numSubarraysWithSum($nums, $goal) {
+    $arrLength = count($nums);
 
-    $left = $right = 0; $maxLength = 0;  $chrHashCounter = []; $maxFreq = 0;
+    if($arrLength == 0) return 0;
 
-    for($right; $right < $length; $right++){
-        if(isset($chrHashCounter[$s[$right]])) $chrHashCounter[$s[$right]]++;
-        else $chrHashCounter[$s[$right]] = 1;
+    $prefixSumCount[0] = 1;
 
-        $maxFreq = max($chrHashCounter[$s[$right]], $maxFreq);
+    $sum = 0; $subArrayCounter = 0;
 
-        while(($right - $left + 1) - $maxFreq > $k){
-            $leftChr = $s[$left];
-            $chrHashCounter[$leftChr]--;
-            if($chrHashCounter[$leftChr] == 0) unset($chrHashCounter[$leftChr]);
-            $left++;
+    foreach($nums as $num){
+        $sum += $num;
+
+        $requiredPrefixSum = $sum - $goal;
+
+        if(isset($prefixSumCount[$requiredPrefixSum])){
+            $subArrayCounter += $prefixSumCount[$requiredPrefixSum];
         }
 
-        $windowLength = $right - $left + 1;
-        $maxLength = max($maxLength, $windowLength);
+        $prefixSumCount[$sum] = isset($prefixSumCount[$sum]) ? $prefixSumCount[$sum]+1 : 1;
+
+        print_r($prefixSumCount);
+
     }
-    return $maxLength;
+
+    
+    return $subArrayCounter;
 }
 
 
-$fruits = "AABABBA"; $k = 1;
-echo characterReplacement($fruits, $k);
+$nums = [1,0,1,0,1]; $goal = 2;
+echo numSubarraysWithSum($nums, $goal);
 
 ?>
 
