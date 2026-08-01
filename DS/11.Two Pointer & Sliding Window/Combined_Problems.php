@@ -369,11 +369,300 @@ function characterReplacement($s, $k) {
 
         return $count;
     }
-}
+
 
 $nums = [1, 0, 1, 0, 1];
 $goal = 2;
 
 echo numSubarraysWithSum($nums, $goal);
 
+
+// Function to calculate number of subarrays with sum exactly equal to goal
+    public function numSubarraysWithSum($nums, $goal)
+    {
+        // Return difference between atMost(goal) and atMost(goal - 1)
+        return $this->atMost($nums, $goal) - $this->atMost($nums, $goal - 1);
+    }
+
+    // Helper function to count number of subarrays with sum at most k
+    private function atMost($nums, $k)
+    {
+        // No valid subarrays if k is negative
+        if ($k < 0) {
+            return 0;
+        }
+
+        $left = 0;
+        $sum = 0;
+        $count = 0;
+
+        // Traverse array using right pointer
+        for ($right = 0; $right < count($nums); $right++) {
+
+            // Add current element into window sum
+            $sum += $nums[$right];
+
+            // Shrink window until sum becomes <= k
+            while ($sum > $k) {
+                $sum -= $nums[$left];
+                $left++;
+            }
+
+            // All subarrays ending at 'right' and starting
+            // from left to right are valid.
+            $count += ($right - $left + 1);
+        }
+
+        return $count;
+    }
+
+
+//1248. Count Number of Nice Subarrays
+    function numberOfSubarrays($nums, $k) {
+
+    // Total number of elements
+    $arrLength = count($nums);
+
+    // Edge case
+    if ($arrLength == 0) return 0;
+
+    // Sliding window pointers
+    $left = 0;
+
+    // Stores total valid subarrays having at most k odd numbers
+    $subArrCounter = 0;
+
+    // Current number of odd elements inside window
+    $oddNumberCounter = 0;
+
+    // Expand the window
+    for ($right = 0; $right < $arrLength; $right++) {
+
+        // If current element is odd, increase odd counter
+        if ($nums[$right] % 2 != 0) {
+            $oddNumberCounter++;
+        }
+
+        // Window has more than k odd numbers
+        // Shrink it from the left
+        while ($oddNumberCounter > $k) {
+
+            // Remove left element contribution
+            if ($nums[$left] % 2 != 0) {
+                $oddNumberCounter--;
+            }
+
+            $left++;
+        }
+
+        /*
+         Window [left...right] now contains
+         at most k odd numbers.
+
+         Every subarray ending at "right"
+         and starting anywhere from
+         left to right is valid.
+
+         Number of such subarrays
+
+             = right - left + 1
+        */
+        $subArrCounter += ($right - $left + 1);
+    }
+
+    return $subArrCounter;
+}
+
+// Exactly K odd numbers
+function niceSubarrays($nums, $k)
+{
+    return numberOfSubarrays($nums, $k)
+         - numberOfSubarrays($nums, $k - 1);
+}
+
+$nums = [2,2,2,1,2,2,1,2,2,2];
+$k = 2;
+
+echo niceSubarrays($nums, $k);
+
+
+//Longest Substring with At Most K Distinct Characters
+
+function lengthOfLongestSubstringKDistinct($s, $k){
+    $strlength = strlen($s);
+    if($strlength == 0) return 0;
+
+    $maxLength = 0; $left = 0; $distintNumCount = [];
+
+    for($right = 0; $right < $strlength; $right++){
+        $distintNumCount[$s[$right]] = isset($distintNumCount[$s[$right]]) ? $distintNumCount[$s[$right]]+1 : 1;
+
+        while(count($distintNumCount) > $k){
+            $leftChr = $s[$left];
+            $distintNumCount[$leftChr]--;
+
+            if($distintNumCount[$leftChr] == 0) unset($distintNumCount[$leftChr]);
+
+            $left++;
+        }
+
+        $windowLength = $right - $left + 1;
+        $maxLength = max($maxLength, $windowLength);
+    }
+
+    return $maxLength ;
+}
+
+$s = "abcddefg";
+$k = 3;
+
+echo lengthOfLongestSubstringKDistinct($s, $k);
+
+
+/**
+    * Optimized solution for strings containing only:
+    *
+    *      a, b and c
+    *
+    * Instead of storing frequencies,
+    * store the latest index of each character.
+    *
+    * Whenever all three characters have been seen,
+    * the earliest last occurrence determines how many
+    * valid substrings end at the current index.
+    *
+    * Time Complexity  : O(n)
+    * Space Complexity : O(1)
+    */
+
+    function numberOfSubstrings($s)
+    {
+        $k = 3;
+        $strLength = strlen($s);
+
+        if ($strLength == 0) {
+            return 0;
+        }
+
+        // Stores the latest index of each character
+        $lastSeen = [];
+
+        $subArrCounter = 0;
+
+        for ($right = 0; $right < $strLength; $right++) {
+
+            // Update latest occurrence
+            $lastSeen[$s[$right]] = $right;
+
+            // Once all K distinct characters are present
+            if (count($lastSeen) == $k) {
+
+                /**
+                * Earliest occurrence among
+                * a,b,c determines how many
+                * substrings end at current position.
+                */
+                $subArrCounter += min(
+                    $lastSeen['a'],
+                    $lastSeen['b'],
+                    $lastSeen['c']
+                ) + 1;
+            }
+        }
+
+        return $subArrCounter;
+    }
+
+    /**
+    * Count substrings containing exactly/at least K distinct characters
+    * (This implementation works for problems like LeetCode 1358 when k = 3).
+    *
+    * Time Complexity  : O(n)
+    * Space Complexity : O(k)
+    *
+    * Idea:
+    * -----
+    * Expand the window using the right pointer.
+    *
+    * As soon as the window contains exactly K distinct characters,
+    * every substring starting from 'left' and ending at
+    * 'right', 'right+1', ..., 'n-1' will also satisfy the condition.
+    *
+    * Therefore, instead of checking each substring individually,
+    * we add:
+    *
+    *      n - right
+    *
+    * Then shrink the window from the left to search for more valid windows.
+    */
+ 
+    function numberOfSubstringsV1($s)
+    {
+        $k = 3;
+        $strLength = strlen($s);
+
+        // Edge case
+        if ($strLength == 0) {
+            return 0;
+        }
+
+        // Left pointer of sliding window
+        $left = 0;
+
+        // Character frequency inside current window
+        $distinctCharCount = [];
+
+        // Final answer
+        $subArrCounter = 0;
+
+        // Expand window
+        for ($right = 0; $right < $strLength; $right++) {
+
+            // Include current character
+            $distinctCharCount[$s[$right]] =
+                isset($distinctCharCount[$s[$right]])
+                    ? $distinctCharCount[$s[$right]] + 1
+                    : 1;
+
+            /**
+            * If window contains exactly K distinct characters,
+            * then every extension of this window is also valid.
+            */
+            while (count($distinctCharCount) == $k) {
+
+                /**
+                * Count all valid substrings.
+                *
+                * Example:
+                *
+                * String : abcabc
+                * Right  : 2 ('c')
+                *
+                * Valid endings:
+                *
+                * abc
+                * abca
+                * abcab
+                * abcabc
+                *
+                * Total = n - right
+                */
+                $subArrCounter += $strLength - $right;
+
+                // Remove leftmost character
+                $leftChar = $s[$left];
+                $distinctCharCount[$leftChar]--;
+
+                // Remove key if frequency becomes zero
+                if ($distinctCharCount[$leftChar] == 0) {
+                    unset($distinctCharCount[$leftChar]);
+                }
+
+                // Shrink window
+                $left++;
+            }
+        }
+
+        return $subArrCounter;
+    }
 ?>

@@ -1216,7 +1216,7 @@ function beautySum($s) {
 //     myAtoi("") → early return 0 ✓
 //     largestOddNumber("") → $high = -1 → loop never runs → "" ✓
 
-?>
+
 $s =  "a good   example";
 echo reverseWords($s) ;
 function reverseWords($s) {
@@ -1371,4 +1371,3 @@ $result = $result * 10 + $lastDigit;
 
 
 
-?>
