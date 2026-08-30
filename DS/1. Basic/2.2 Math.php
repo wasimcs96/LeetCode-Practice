@@ -53,6 +53,7 @@ function countDigits($n) {
     $digits = 0;
     while ((int)$x != 0) {
         $x = (int)($x / 10);  // Remove last digit
+        //$x = intdiv($x, 10);
         $digits++;             // Count each removal
     }
     return $digits;
@@ -86,6 +87,35 @@ function countDigitsString($n) {
 function countDigitsLog($n) {
     return ((int)log10($n)) + 1;
 }
+
+/*
+     * Function to count the number
+     * of odd digits in n.
+     */
+    function countOddDigit($n)
+    {
+        // Counter to store the number of odd digits
+        $oddDigits = 0;
+
+        // Continue until all digits are processed
+        while ($n > 0) {
+
+            // Extract the last digit
+            $lastDigit = $n % 10;
+
+            // Check whether the digit is odd
+            if ($lastDigit % 2 != 0) {
+
+                // Increment odd digit counter
+                $oddDigits++;
+            }
+
+            // Remove the last digit
+            $n = intdiv($n, 10);
+        }
+
+        return $oddDigits;
+    }
 
 
 /*
@@ -178,6 +208,44 @@ class Solution {
         return $result;
     }
 }
+
+/*
+     * Function to check whether a number
+     * is a perfect number or not.
+     *
+     * A perfect number is a number whose
+     * proper divisors add up to the number itself.
+     *
+     * Example:
+     * 6 -> divisors: 1, 2, 3
+     *
+     * 1 + 2 + 3 = 6
+     *
+     * Therefore, 6 is a perfect number.
+     */
+    function isPerfect($n)
+    {
+        // Variable to store the sum of proper divisors
+        $sum = 0;
+
+        /*
+         * Check every number from 1 to n-1.
+         *
+         * If n % i == 0, then i is a divisor of n.
+         */
+        for ($i = 1; $i < $n; $i++) {
+
+            // Check whether i is a proper divisor
+            if ($n % $i == 0) {
+
+                // Add divisor to sum
+                $sum += $i;
+            }
+        }
+
+        // A perfect number has divisor sum equal to itself
+        return $sum === $n;
+    }
 
 
 /*

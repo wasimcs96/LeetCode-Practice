@@ -420,7 +420,7 @@ class LinkedList
     //
     // TC: O(N)  SC: O(1)
     // ----------------------------------------------------------
-    public function reverseIterative(): void
+    public function reverseIterative(): ?Node
     {
         $prev    = null;
         $current = $this->head;
@@ -433,6 +433,7 @@ class LinkedList
         }
 
         $this->head = $prev; // prev now points to the new head (old tail)
+        return $prev;
     }
 
     // ----------------------------------------------------------
@@ -471,6 +472,17 @@ class LinkedList
         return $newHead;
     }
 
+    function reverseListRecursive($head, $prev = null) {
+        if($head == null) {
+            return $prev;
+        }
+        $current = $head;
+        $next = $current->next;
+        $current->next = $prev;
+        $prev = $current;
+        return $this->reverseListRecursive($next, $prev);
+    }
+
 
     // ----------------------------------------------------------
     // DETECT CYCLE (LeetCode 141) — Floyd's Cycle Detection
@@ -489,19 +501,37 @@ class LinkedList
     // ----------------------------------------------------------
     public function hasCycle(?Node $head): bool
     {
-        if ($head === null || $head->next === null) return false;
+        //hash map approch if repeat element  found then it is a loop 
+        // Approch -1 HasMap   
+        // $visited = [];
+        // $current = $head;
+        // while ($current !== null) {
+        //     $hash = spl_object_hash($current);
+        //     if (isset($visited[$hash])) {
+        //         return true;
+        //     }
+        //     $visited[$hash] = true;
+        //     $current = $current->next;
+        // }
+        // return false;
 
-        $slow = $head;
-        $fast = $head;
 
-        while ($fast !== null && $fast->next !== null) {
-            $slow = $slow->next;
-            $fast = $fast->next->next;
+        //OR
+        //Tortoise and Hare Algorithm approch
+        $slowPtr = $head;
+        $fastPtr = $head;
+        if($fastPtr == null || $fastPtr->next == null) return false;
 
-            if ($slow === $fast) return true; // Same object → cycle exists
+        while($fastPtr != null && $fastPtr->next != null){
+            $slowPtr = $slowPtr->next;
+            $fastPtr = $fastPtr->next->next;
+            
+            if($slowPtr === $fastPtr) {
+                return true;
+            }
         }
+        return false;
 
-        return false; // Fast reached null → no cycle
     }
 
 
@@ -657,22 +687,51 @@ class LinkedList
     //
     // TC: O(N)  SC: O(1)
     // ----------------------------------------------------------
-    public function deleteMiddle(): void
-    {
-        if ($this->head === null || $this->head->next === null) {
-            $this->head = null;
-            return;
+    public function deleteMiddle($head): void
+ {
+        //Mid Approch
+        // $this->head = $head;
+        // if($this->head == null || $this->head->next == null) {
+        //     $this->head = null;
+        //     return $this->head;
+        // }
+
+        // if($this->head->next->next == null){
+        //     $this->head->next = null;
+        //     return $this->head;
+        // }
+        // $length = $this->getLength();
+        // $midNode = intval($length / 2);
+
+        // $current = $this->head; $counter = 1;
+
+        // while($counter < $midNode){
+        //     $current = $current->next;
+        //     $counter++;
+        // }
+        // $current->next = $current->next->next;
+        // return $this->head;
+
+
+        //Fast and Slow Pointer Approch
+        if($head == null || $head->next == null) {
+            return null;
+        }
+        if($head->next->next == null) {
+            $head->next = null; 
+            return $head;
         }
 
-        $slow = $this->head;
-        $fast = $this->head->next->next; // Fast starts 2 steps ahead of slow
+        $slowPtr = $fastPtr = $head;
+        //$fastPtr = $fastPtr->next->next; //->second approch skip 1 step approch
 
-        while ($fast !== null && $fast->next !== null) {
-            $slow = $slow->next;
-            $fast = $fast->next->next;
+        while($fastPtr != null && $fastPtr->next != null) {
+            $fastPtr = $fastPtr->next->next;
+            $slowPtr = $slowPtr->next ;
         }
-
-        $slow->next = $slow->next->next; // Skip the middle node
+        //$slowPtr->val = $slowPtr->next->val; //delete this line in second approch skip 1 step approch
+        $slowPtr->next = $slowPtr->next->next;
+        return $head;
     }
 
 
@@ -770,13 +829,70 @@ class LinkedList
     //
     // TC: O(N)  SC: O(1) — only 6 pointer variables, no new nodes
     // ----------------------------------------------------------
-    public function sortZeroOneTwoList(?Node $head): ?Node
+     public function sortZeroOneTwoList(){
+        $temp1 = $temp2 = $temp3 = null;
+
+        $current = $this->head; 
+        
+        $zeroHead = $oneHead = $twoHead = null;
+        while($current != null){
+            if($current->val == 0){
+                if($temp1 == null) {
+                    $temp1 = $current;
+                    $zeroHead = $temp1;
+                }else{
+                    $temp1->next = $current;
+                    $temp1 = $temp1->next;
+                }
+            }elseif($current->val == 1){
+                if($temp2 == null) {
+                    $temp2 = $current;
+                    $oneHead = $temp2;
+                }else{
+                    $temp2->next = $current;
+                    $temp2 = $temp2->next;
+                }
+            }else{
+                if($temp3 == null) {
+                    $temp3 = $current;
+                    $twoHead = $temp3;
+                }else{
+                    $temp3->next = $current;
+                    $temp3 = $temp3->next;
+                }
+            }
+
+            $current = $current->next;
+        }
+
+        $head = $zeroHead ?? $oneHead ?? $twoHead;
+        if($head == $zeroHead)  {
+            if($temp2 != null)  {
+                $temp1->next = $oneHead;
+                $temp2->next = $twoHead;
+            }
+            else {
+                $temp1->next = $twoHead;
+            }
+        }elseif ($head == $oneHead)  {
+            $temp2->next = $twoHead;
+        }
+        $temp3->next = null;
+
+        
+        return $head;
+    }
+    public function sortZeroOneTwoListV2(?Node $head): ?Node
     {
+        
         if ($head === null || $head->next === null) return $head;
 
-        $d0 = new Node(-1); $c0 = $d0; // Dummy head for 0s
-        $d1 = new Node(-1); $c1 = $d1; // Dummy head for 1s
-        $d2 = new Node(-1); $c2 = $d2; // Dummy head for 2s
+        $d0 = new Node(-1); 
+        $c0 = $d0; // Dummy head for 0s
+        $d1 = new Node(-1); 
+        $c1 = $d1; // Dummy head for 1s
+        $d2 = new Node(-1); 
+        $c2 = $d2; // Dummy head for 2s
 
         $current = $head;
         while ($current !== null) {
@@ -823,6 +939,40 @@ class LinkedList
     // ----------------------------------------------------------
     public function oddEvenIndexList(?Node $head): ?Node
     {
+
+    //Another Approch
+        //Create a array inwhich first elemnts will be odds and then even numbers and replace linklist with these number 
+        // temp = temp->next-next approch.
+
+        // if($head == null || $head->next == null) return $head;
+
+        // $currentNode = $head;
+
+        // $oddHead  = new ListNode(-1);
+        // $evenHead = new ListNode(-1);
+       
+        // $odd = $oddHead; 
+        // $even = $evenHead; 
+        // $countIndex = 1;
+        // while($currentNode != null){
+        //     $numberIsEven =  (($countIndex % 2) == 0) ? true  : false ; 
+        //     if($numberIsEven){
+        //         $even->next = $currentNode;
+        //         $even = $even->next;
+        //     }
+        //     else{ 
+        //         $odd->next = $currentNode;
+        //         $odd = $odd->next;
+        //     }
+        //     $currentNode = $currentNode->next;
+        //     $countIndex++;
+        // }
+       
+        // $odd->next = ($evenHead->next) ? $evenHead->next : null;  
+        // $even->next =  null;  
+        // return $oddHead->next; 
+         
+        ////Second Approch
         if ($head === null || $head->next === null) return $head;
 
         $odd      = $head;
@@ -937,6 +1087,36 @@ class LinkedList
         }
     }
 
+    public function addOneToList(){
+        $this->reversList();
+        $current = $this->head;
+        
+        $carry = 1;
+        while($current != null){
+            $sum = $current->val + $carry;
+
+            $carry = intval($sum / 10);
+            $current->val = $sum % 10;
+            // if($sum == 10){
+            //     $current->val = 0;
+            //     $carry = 1;
+            // }else{
+            //     $current->val = $sum;
+            //     $carry = 0;
+            // }
+
+            if ( $carry === 0) {
+                break;
+            }
+            if($current->next == null && $carry == 1){
+                $current->next = new Node(1);
+                break;
+            }
+            $current=$current->next;
+        }
+        $this->reversList();
+    }
+
 
     // ----------------------------------------------------------
     // ADD TWO NUMBERS (LeetCode 2)
@@ -977,6 +1157,86 @@ class LinkedList
 
         return $dummy->next;
     }
+
+    public function getIntersectionNode($list1, $list2){
+        // $a == $b    // true  → same values/properties
+        // $a === $b   // false → different Node objects
+        // $a === $c   // true  → same Node object
+
+
+        if($headA == null || $headB == null) return null;
+        // Brute force aproch
+        // $l1 = $headA;
+        // $l2 = $headB;
+        // while($l1 != null){
+        //     $l2 = $headB;
+        //     while($l2 != null){
+        //         if($l1 === $l2){
+        //             return $l1;
+        //         }
+        //         $l2 = $l2->next;
+        //     }
+        //     $l1 = $l1->next;
+        // }
+        // return null;
+
+        //Next Approch : Shortest List 
+        // $l1 = $headA;
+        // $l2 = $headB;
+        
+        // $shorterList = $this->getLength($l1) < $this->getLength($l2) ? $l1 : $l2;
+        // $longerList = $shorterList === $l1 ? $l2 : $l1;
+        // $diff = abs($this->getLength($l1) - $this->getLength($l2));
+        // while($diff > 0){
+        //     $longerList = $longerList->next;
+        //     $diff--;
+        // }
+        
+        // while($longerList != null && $shorterList != null){
+            
+        //     if($shorterList === $longerList)
+        //         return $shorterList;
+            
+        //     $longerList = $longerList->next;
+        //     $shorterList = $shorterList->next;
+        // }
+        // return null;
+
+        //Approach 3: Using HashSet
+        // $list1 = $headA;
+        // $list2 = $headB;
+        // $set = [];
+        // $current1 = $list1;
+        // while($current1 != null){
+        //     $set[spl_object_hash($current1)] = true;
+        //     $current1 = $current1->next;
+        // }
+
+        // $current2 = $list2;
+        // while($current2 != null){
+        //     if(isset($set[spl_object_hash($current2)])){
+        //         return $current2;
+        //     }
+        //     $set[spl_object_hash($current2)] = true;
+        //     $current2 = $current2->next;
+        // }
+        // return null;
+
+
+        //Approach 3: Using two pointers
+        $p1 = $headA;
+        $p2 = $headB;
+
+        while ($p1 !== $p2) {
+
+            $p1 = ($p1 === null) ? $headB : $p1->next;
+            $p2 = ($p2 === null) ? $headA : $p2->next;
+        }
+
+        return $p1;
+    }
+
+    
 }
 
 
@@ -1062,7 +1322,7 @@ $ll->head = $ll->sortList($ll->head);
 $ll->printList();                            // 1 → 2 → 3 → 4 → NULL
 
 echo "\n=== Sort 0s 1s 2s ===\n";
-$ll->fromArray([1, 0, 2, 1, 0]);
+$ll->fromArray([1, 0, 1, 0]);
 $ll->sortZeroOneTwoList($ll->head);
 $ll->printList();                            // 0 → 0 → 1 → 1 → 2 → NULL
 

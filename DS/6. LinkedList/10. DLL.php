@@ -420,7 +420,9 @@ class DLL
         }
         // current is now the k-th node to delete
         $current->prev->next = $current->next; // prev → next (skip current)
-        $current->next->prev = $current->prev; // prev ← next (skip current)
+        if($current->next != null){
+            $current->next->prev = $current->prev; // prev ← next (skip current)
+        }
     }
 
     // ----------------------------------------------------------
@@ -455,6 +457,34 @@ class DLL
             }
             $current = $current->next;
         }
+    }
+
+    public function deleteNode($node){
+        $prevNode = $node->prev;
+        $nextNode = $node->next;
+
+        $prevNode->next = $nextNode;
+        if($nextNode !== null){
+            $nextNode->prev = $prevNode;
+        }
+
+        $node->next = $node->prev = null; // Clear the deleted node's pointers
+
+        return;
+    }
+
+    function insertNodeBeforeByReference($x, $node)
+    {
+        $currentNode = $node;
+        if($currentNode == null){
+            return;
+        }
+        $newNode = new DoublyNode($x);
+        $newNode->next = $node;
+        $newNode->prev = $node->prev;
+        $newNode->prev->next = $newNode;
+        $node->prev = $newNode;
+        return;
     }
 
     // ----------------------------------------------------------
