@@ -594,6 +594,20 @@ class LinkedList
     // ----------------------------------------------------------
     public function isPalindrome(?Node $head): bool
     {
+
+    // $length = $this->getLength();
+        // $current = $this->head; $stackArr = [];
+        // while($current){
+        //     $stackArr[] = $current->val;
+        //     $current = $current->next;
+        // }
+        // $current = $this->head;
+        // while($length >= 1){
+        //     if($current->val !=  $stackArr[$length-1]) return false;
+        //     $current = $current->next;
+        //     $length--;
+        // }
+        // return true;
         if ($head === null || $head->next === null) return true;
 
         // Step 1: Find first middle (use &&, NOT || to avoid null crash)
@@ -1236,7 +1250,254 @@ class LinkedList
         return $p1;
     }
 
+    function hasCycle($head) {
+        //hash map approch if repeat element  found then it is a loop 
+        // Approch -1 HasMap   
+        // $visited = [];
+        // $current = $head;
+        // while ($current !== null) {
+        //     $hash = spl_object_hash($current);
+        //     if (isset($visited[$hash])) {
+        //         return true;
+        //     }
+        //     $visited[$hash] = true;
+        //     $current = $current->next;
+        // }
+        // return false;
+
+
+        //OR
+        //Tortoise and Hare Algorithm approch
+        $slowPtr = $head;
+        $fastPtr = $head;
+        if($fastPtr == null || $fastPtr->next == null) return false;
+
+        while($fastPtr != null && $fastPtr->next != null){
+            $slowPtr = $slowPtr->next;
+            $fastPtr = $fastPtr->next->next;
+            
+            if($slowPtr === $fastPtr) {
+                return true;
+            }
+        }
+        return false;
+    }
     
+
+//   HEAD
+//   ↓
+//   1 → 2 → 3 → 5 → 4 ─→ 6
+//                  ↑         ↓
+//                  │         7
+//                  │         ↓
+//                  └── 9 ← 8
+
+        //Slow reach to 4 then fast reach to 9 bcz fast is moving 2steps
+    //lets assume Head to slow length is L1 (head to 4 is 4)
+    //then slow to fast length is also L1 (4 to 9 is 4) as (head to fast is 2L1)
+    //cicle length would be L1 + D where d is distance from fast to slow  
+    // slow will move by 1 and fast will move by 2 so D will reduce by only 1 so it will take D steps to meet each other so slow will move D steps and fast will move 2D.
+    //if in cicle after D steps we will get collide node means distanse between collide node to circle start node is L1 + D - D = L1. 
+    //And We know L1 is distance from head to circle start node so if we move slow from head and fast from collide node and move both by 1 step then they will meet at circle start node.
+    //Floyd's Cycle Detection
+    function detectCycle($head) {
+        //First approch use with hashmap
+        $slowPtr = $head;
+        $fastPtr = $head;
+
+        if($fastPtr == null || $fastPtr->next == null) return null;
+
+        while($fastPtr != null && $fastPtr->next != null){
+            $slowPtr = $slowPtr->next;
+            $fastPtr = $fastPtr->next->next;
+            
+            if($slowPtr === $fastPtr) {
+                $slowPtr = $head;
+                while($slowPtr !== $fastPtr){
+                    $slowPtr = $slowPtr->next;
+                    $fastPtr = $fastPtr->next;
+                    //To get Length of circle run a loop with slow to slow or fast to fast with using a counter
+
+                } 
+                return $slowPtr;
+            }
+        }
+        return null;
+    }
+
+
+     function reverseKGroup($head, $k){
+        
+        $dummy = new ListNode(-1);
+        $previousGroupTail = $dummy;
+        $currentNode = $head;
+
+        while ($currentNode != null) {
+            $groupStart = $currentNode;
+            $groupEnd = $currentNode;
+
+            for ($i = 1; $i < $k; $i++) {
+                if ($groupEnd == null) {
+                    return $dummy->next;
+                }
+
+                $groupEnd = $groupEnd->next;
+            }
+
+            if ($groupEnd == null) {
+                break;
+            }
+
+            $nextGroupStart = $groupEnd->next;
+
+            $previousNode = $nextGroupStart;
+            $currentNode = $groupStart;
+
+            while ($currentNode != $nextGroupStart) {
+                $nextNode = $currentNode->next;
+                $currentNode->next = $previousNode;
+                $previousNode = $currentNode;
+                $currentNode = $nextNode;
+            }
+
+            $previousGroupTail->next = $groupEnd;
+            $previousGroupTail = $groupStart;
+            $currentNode = $nextGroupStart;
+        }
+        return $dummy->next;
+    }
+
+    function reverseKGroupWithProperComments($head, $k)
+    {
+        // Dummy node helps us easily connect the reversed groups.
+        $dummy = new ListNode(-1);
+
+        // Tail of the already processed/reversed part.
+        $previousGroupTail = $dummy;
+
+        // Start processing from the first node.
+        $currentNode = $head;
+
+        while ($currentNode != null) {
+
+            /*
+            * ---------------------------------------------------------
+            * STEP 1: Find the end of the current group
+            * ---------------------------------------------------------
+            *
+            * Example: k = 2
+            *
+            * 1 → 2 → 3 → 4 → 5
+            * ↑   ↑
+            * start end
+            */
+
+            $groupStart = $currentNode;
+
+            $groupEnd = $currentNode;
+
+            // Move k-1 times to find the kth node.
+            for ($i = 1; $i < $k; $i++) {
+
+                // Not enough nodes remaining.
+                if ($groupEnd == null) {
+                    return $dummy->next;
+                }
+
+                $groupEnd = $groupEnd->next;
+            }
+
+            // If fewer than k nodes remain, don't reverse them.
+            if ($groupEnd == null) {
+                break;
+            }
+
+            /*
+            * ---------------------------------------------------------
+            * STEP 2: Save the next group
+            * ---------------------------------------------------------
+            *
+            * Example:
+            *
+            * 1 → 2 → 3 → 4 → 5
+            *     ↑
+            *  groupEnd
+            *
+            * nextGroupStart = 3
+            */
+
+            $nextGroupStart = $groupEnd->next;
+
+            /*
+            * ---------------------------------------------------------
+            * STEP 3: Reverse current group
+            * ---------------------------------------------------------
+            *
+            * Before:
+            *
+            * 1 → 2 → 3
+            *
+            * Current group:
+            *
+            * 1 → 2
+            *
+            * After:
+            *
+            * 2 → 1 → 3
+            */
+
+            $previousNode = $nextGroupStart;
+            $currentNode = $groupStart;
+
+            while ($currentNode != $nextGroupStart) {
+
+                $nextNode = $currentNode->next;
+
+                $currentNode->next = $previousNode;
+
+                $previousNode = $currentNode;
+                $currentNode = $nextNode;
+            }
+
+            /*
+            * ---------------------------------------------------------
+            * STEP 4: Connect previous group to reversed group
+            * ---------------------------------------------------------
+            *
+            * previousGroupTail
+            *       ↓
+            * dummy → 2 → 1 → 3
+            *
+            * groupStart (1) is now the TAIL of reversed group.
+            */
+
+            $previousGroupTail->next = $groupEnd;
+
+            /*
+            * ---------------------------------------------------------
+            * STEP 5: Update previousGroupTail
+            * ---------------------------------------------------------
+            *
+            * groupStart is now the tail.
+            *
+            * dummy → 2 → 1 → 3
+            *              ↑
+            *      previousGroupTail
+            */
+
+            $previousGroupTail = $groupStart;
+
+            /*
+            * ---------------------------------------------------------
+            * STEP 6: Move to next group
+            * ---------------------------------------------------------
+            */
+
+            $currentNode = $nextGroupStart;
+        }
+
+        return $dummy->next;
+    }
 }
 
 

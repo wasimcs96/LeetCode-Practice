@@ -781,5 +781,56 @@ function printPrimeFactorsWithSieve($n) {
 // printPrimeFactorsWithSieve(780);  // Output: [2, 3, 5, 13]
 
 
+//Palindrome Number
+
+function checkPalindrome($n){
+    $reverseNumner = 0; $original = $n;
+
+    while($n > 0){
+        $digit =(int) ($n % 10);
+        $reverseNumner = $reverseNumner * 10 + $digit;
+        $n = (int) ($n / 10);
+    }
+    if($original == $reverseNumner) return true;
+    else return false;
+}
+
+//var_dump(checkPalindrome(121));
+
+
+//factorial Numbber
+
+function factorialNumber($n){
+    if($n == 0 || $n == 1) return $n;
+
+    $result = 1;
+
+    while($n > 0){
+        $result = $result * $n;
+        $n--;
+    }
+    return $result;
+}
+//var_dump(factorialNumber(3));
+
+
+// function findLcm($x, $y){
+//     $a = $x; $b = $y;
+//     while($a != $b){
+//         if($a > $b) $b += $y;
+//         else if($b > $a) $a += $x;
+//     }
+//     return $a;
+// }
+
+//OR
+function findLcm($x, $y){
+    $gcd = findGCDEuclidean($x, $y);
+    $result = (int) (($x * $y) / $gcd);
+    return $result;
+}
+
+
+echo findLcm(3, 5);
 ?>
 

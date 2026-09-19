@@ -491,7 +491,7 @@ class LinkedList{
         return $p1;
     }
 
-    unction hasCycle($head) {
+    function hasCycle($head) {
         //hash map approch if repeat element  found then it is a loop 
         // Approch -1 HasMap   
         // $visited = [];
@@ -522,18 +522,95 @@ class LinkedList{
             }
         }
         return false;
-
-        
     }
 
+    //Floyd's Cycle Detection
+    function detectCycle($head) {
+        //First approch use with hashmap
+        $slowPtr = $head;
+        $fastPtr = $head;
 
+        if($fastPtr == null || $fastPtr->next == null) return null;
+        $totalLength = 0; $slowtoCollideLength = 0; $collideToStartLength = 0;
+        while($fastPtr != null && $fastPtr->next != null){
+            $slowPtr = $slowPtr->next;
+            $fastPtr = $fastPtr->next->next;
+            $slowtoCollideLength++;
+            echo $slowPtr->val;
+                echo $fastPtr->val;
+            if($slowPtr === $fastPtr) {
+                $slowPtr = $head;
+                
+                while($slowPtr !== $fastPtr){
+                    $collideToStartLength++;
+                    $slowPtr = $slowPtr->next;
+                    $fastPtr = $fastPtr->next;
+                } 
+                echo "slowtoCollideLength: ".$slowtoCollideLength." collideToStartLength: ".$collideToStartLength;
+                echo "\nTotal Length: ".($slowtoCollideLength + $collideToStartLength);
+                return $slowPtr;
+            }
+        }
+        return null;
+    }
 
-    
+    function reverseKGroup($head, $k){
+        $current = $head; $c = $k;
 
+        while($current != null){
+            $c--;
+            $current = $current->next;
+        }
+        if($c > 0) return $head;
 
+        $current = $head; $head = $tempHead = new Node(-1);
+        while($current != null){
+            $GSN = $current; $c = $k-1;
+            while($c > 0 && $current != null){
+                $c--;
+                $current = $current->next;
+            }
+            //echo $current->val;
+            if($c <= 0 && $current != null){ 
+                $GEN = $current;
+                $GNN = $GEN->next;
+                $current = $GNN;
+                $GEN->next = null;
+                //reverse the group
+                $HeadOfReversedGroup = $this->reversListModify($GSN, $GNN);
+                $tempHead->next = $HeadOfReversedGroup;
+                $GSN->next = $GNN;
+                $tempHead = $GSN;
 
+            }else{
+                if($current != null) $current = $current->next;
+            }
+        }
+        return $head->next;
+    }
+
+    function reversListModify($head = null, $tail = null) {
+        $current = $head ?? $this->head;
+        $prev = $tail;
+        while($current != null){
+            $next = $current->next;
+            $current->next = $prev;
+            $prev = $current;
+            $current = $next;
+            
+        }
+        //$this->head = $prev;  
+        
+        return $prev;     
+    }
 }
 
+
+$list1 = [1,2,3,4, 5];
+$linkedList1 = new LinkedList();
+$linkedList1->arrayToLinkedList($list1);
+$linkedList1->head = $linkedList1->reverseKGroup($linkedList1->head, 2);
+echo $linkedList1->printList();
 //$ll1 = new LinkedList();
 //$ll1->arrayToLinkedList([1,2,3,4,5]);
 //echo "\n";
@@ -579,13 +656,14 @@ $list1 = [1,2,3,4,5]; $list2 = [1,2]; $list3 = [1,0,0,2,1,0];
 $linkedList3 = new LinkedList(); 
 $l1 = $linkedList3->head = new Node(1);
 $l1->next = new Node(2);
-$l1->next->next = new Node(3);
+$l1->next->next = $node3= new Node(3);
 $l1->next->next->next = new Node(4);
 $l1->next->next->next->next = new Node(5);
+$l1->next->next->next->next->next = $node3;
 
-$linkedList4 = new LinkedList(); 
-$l2 = $linkedList4->head = new Node(1);
-$l2->next = new Node(10);
+// $linkedList4 = new LinkedList(); 
+// $l2 = $linkedList4->head = new Node(1);
+// $l2->next = new Node(10);
 // $l2->next->next = new Node(6);
 
 
@@ -593,10 +671,10 @@ $l2->next = new Node(10);
 // Create intersection
 //$l2->next = $l1->next->next->next;
 
-echo $linkedList3->printList();
-echo $linkedList4->printList();
-echo "Answer---->"; var_dump($linkedList3->test($linkedList3->head, $linkedList4->head));
-
+// echo $linkedList3->printList();
+// echo $linkedList4->printList();
+// echo "Answer---->"; //var_dump($linkedList3->test($linkedList3->head, $linkedList4->head));
+// var_dump($linkedList3->detectCycle($linkedList3->head));
 //echo $linkedList3->printList();
 
 die;
@@ -858,6 +936,22 @@ class DoublyLinkedList{
         $newNode->prev->next = $newNode;
         $node->prev = $newNode;
         return;
+    }
+
+    function test(){
+        $head = $this->head;
+        if($head == null || ($head->next == null && $head->val == 1))
+            return null;
+
+        $current = $head;
+        while($current != null){
+            if($current->val == 1){
+                $next = $current->next;
+                $prev = $current->prev;
+            }
+            $current = $current->next;
+            
+        }
     }
         
 }   
