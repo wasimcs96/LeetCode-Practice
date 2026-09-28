@@ -561,6 +561,42 @@ $fc->findMinMax([10, 5, 10, 15, 10, 5]);
 echo "\n";
 
 
+
+$arr = [10,9,7,7];
+$length = count($arr); $hashMap = [];
+
+for($i=0;$i<$length;$i++){
+    $hashMap[$arr[$i]] = $hashMap[$arr[$i]] ??  0;
+    $hashMap[$arr[$i]]++;
+}
+$maxEle = $seondMaxEle = null; 
+$maxFreq = $sdMaxFreq = -1;
+
+foreach($hashMap as $ele => $freq){
+    if($maxFreq < $freq){
+        $seondMaxEle = $maxEle;
+        $sdMaxFreq = $maxFreq;
+
+        $maxEle = $ele;
+        $maxFreq = $freq;
+
+    }elseif($maxFreq == $freq){
+        // $seondMaxEle = $maxEle;
+        // $sdMaxFreq = $maxFreq;
+        $maxEle = min($ele, $maxEle);
+    }else{
+        if($sdMaxFreq < $freq) {
+            $seondMaxEle = $ele;
+            $sdMaxFreq = $freq;
+        }elseif($sdMaxFreq == $freq){
+             $seondMaxEle = min($ele, $seondMaxEle);
+        }
+    }
+}
+
+echo $seondMaxEle;
+
+
 // ============================================================================
 //  SECTION 5  :  CLASSIC HASHMAP INTERVIEW PROBLEMS
 // ============================================================================

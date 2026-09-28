@@ -259,6 +259,7 @@ echo implode(", ", $arr) . "\n\n";
 // Space Complexity: O(N)
 // ============================================================
 
+//Can use Two pointer approch as well
 function isPalindromeStr(array $chars, int $i, int $n): bool
 {
     // Base case: checked all mirror pairs → it's a palindrome
@@ -288,6 +289,19 @@ foreach ($tests as $str) {
     echo "\"$str\" is" . ($result ? "" : " NOT") . " a palindrome\n";
 }
 echo "\n";
+
+
+function checkPalindrome($s, $left, $right){
+    if($left >= $right) return true;
+
+    if($s[$left] != $s[$right]) return false;
+
+    return checkPalindrome($s, $left+1, $right-1);
+}
+
+$s = 'aabbcccdbbaa'; $right = count(str_split($s))-1;
+
+var_dump(checkPalindrome($s,0,$right));
 
 
 // ============================================================
@@ -432,7 +446,7 @@ function checkPalindromeRecursive(array $arr, int $i, int $j): bool
     if ($arr[$i] !== $arr[$j]) return false;           // Mismatch found
 
     return checkPalindromeRecursive($arr, $i + 1, $j - 1);  // Check inner part
-}
+} 
 
 function isValidPalindrome(string $s): bool
 {
@@ -470,6 +484,36 @@ var_dump(isValidPalindrome("A man, a plan, a canal: Panama"));
 echo "Valid Palindrome 'race a car': ";
 var_dump(isValidPalindrome("race a car"));
 echo "\n";
+
+
+function checkPrime($n, $num){
+    if($num >= sqrt($n)) return true;
+
+    if($n % $num == 0) return false;
+
+    return checkPrime($n, $num + 1);
+} 
+
+var_dump(checkPrime(6, 2));
+
+
+function addDigits(int $num){
+    //if((int) ($num / 10) == 0) return $num;
+    if($num <  10) return $num;
+
+    $sum = 0;
+    while($num){
+        $digit = (int) $num % 10;
+        $sum += $digit;
+        $num = (int) $num / 10;
+    }
+    return addDigits((int) $sum);
+
+}
+
+$num = 529;
+echo addDigits($num);
+
 
 
 // ============================================================

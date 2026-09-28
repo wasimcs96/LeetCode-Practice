@@ -412,9 +412,14 @@ function largestOddNumber(string $num): string
 {
     $n = strlen($num);
 
+    
+    for($k=0;$k<$n;$k++){
+        if($num[$k] != '0') break;
+    }
+
     for ($i = $n - 1; $i >= 0; $i--) {          // Scan from the right for the rightmost odd digit
         if (((int) $num[$i]) % 2 !== 0) {        // Explicit (int) cast -- do not rely on implicit coercion
-            return substr($num, 0, $i + 1);       // Prefix up to and including this odd digit is the answer
+            return substr($num, $k, $i + 1 - $k);       // Prefix up to and including this odd digit is the answer
         }
     }
 
