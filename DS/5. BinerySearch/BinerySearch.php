@@ -29,6 +29,7 @@ $arr = [1,2,2,3]; $k=2;
 $low = 0; $high = count($arr)-1;
 
 echo binerySearch($arr, $low, $high, $k);
+
 function binerySearch(array $arr, int $low, int $high, int $k){
     if($low > $high) return -1;
     $mid = (int) (($low+$high) / 2);

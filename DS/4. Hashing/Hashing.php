@@ -716,11 +716,13 @@ function countPairsWithSum(array $nums, int $target): int
         }
 
         // Store AFTER checking to avoid pairing an element with itself
-        if (isset($freqMap[$num])) {
-            $freqMap[$num]++;
-        } else {
-            $freqMap[$num] = 1;
-        }
+        // if (isset($freqMap[$num])) {
+        //     $freqMap[$num]++;
+        // } else {
+        //     $freqMap[$num] = 1;
+        // }
+
+        $freqMap[$num] = ($freqMap[$num] ?? 0) + 1;
     }
 
     return $pairs;
@@ -835,14 +837,16 @@ echo "     Output: " . (hasZeroSumSubarray([4, 2, -3, 1, 6]) ? "true" : "false")
 function longestSubarrayWithZeroSum(array $arr): int
 {
     $firstIndex    = [];
-    $firstIndex[0] = -1;       // Prefix sum 0 is "seen" before the array starts (index -1)
+    $firstIndex = [];         // Prefix sum 0 is "seen" before the array starts (index -1)
     $prefixSum     = 0;
     $maxLen        = 0;
 
     foreach ($arr as $i => $num) {
         $prefixSum += $num;
 
-        if (isset($firstIndex[$prefixSum])) {
+        if($prefixSum == 0){
+            $maxLen = max($maxLen, $i + 1);
+        }else if (isset($firstIndex[$prefixSum])) {
             // Same prefix sum was seen at firstIndex[$prefixSum]
             // → subarray from (firstIndex[$prefixSum]+1) to i has sum = 0
             $len    = $i - $firstIndex[$prefixSum];
@@ -968,16 +972,23 @@ echo "     Output: " . countSubarraysWithSumK([1, 1, 1], 2) . " subarrays\n\n";
   TIME  : O(n)
   SPACE : O(n)
 */
+
+//Solution for negative and positive values
 function longestSubarrayWithSumK(array $arr, int $k): int
 {
     $firstIndex    = [];
-    $firstIndex[0] = -1;       // Prefix sum 0 before the array = index -1
+    $firstIndex[0] = 1;       // Prefix sum 0 before the array = index -1
     $prefixSum     = 0;
     $maxLen        = 0;
 
     foreach ($arr as $i => $num) {
         $prefixSum += $num;
-        $need       = $prefixSum - $k;
+        
+        if($prefixSum == $k){
+            $maxLen = max($maxLen, $i + 1);
+        }
+
+        $need = $prefixSum - $k;
 
         if (isset($firstIndex[$need])) {
             $len    = $i - $firstIndex[$need];
@@ -993,9 +1004,74 @@ function longestSubarrayWithSumK(array $arr, int $k): int
     return $maxLen;
 }
 
+//Two pointer approch
+function longestSubarrayWithSumKV2(array $arr, int $k): int
+{
+    $maxLen = 0; $sum = $arr[0];
+    $left = $right = 0;
+
+    while($right < count($arr)){
+        
+        while($left <= $right && $sum > $k){
+            $sum -= $arr[$left];
+            $left++;
+        }
+
+        if($sum == $k){
+            $maxLen = max($maxLen, $right-$left + 1);
+        }
+
+        $right++;
+
+        if($right < count($arr)){
+            $sum += $arr[$right];
+        }
+
+
+    }
+
+    return $maxLen;
+    
+}
+
+echo "     Output: Length = " . longestSubarrayWithSumK([10, 5, 2, 7, 1, 9], 15) . "\n\n";
+
 echo "5.6  Longest Subarray With Sum = K:\n";
 echo "     Input: [1, -1, 5, -2, 3], k=3\n";
-echo "     Output: Length = " . longestSubarrayWithSumK([1, -1, 5, -2, 3], 3) . "\n\n";
+echo "     Output: Length = " . longestSubarrayWithSumKV2([1, -1, 5, -2, 3], 3) . "\n\n";
+
+////Solution for  positive values
+function longestSubarrayWithSumKForPositive(array $arr, int $k): int
+{
+    $hashMap = [];
+    $maxLen = 0; $sum = 0;
+
+
+    foreach($arr as $i => $num){
+        $sum += $num;
+
+        if($sum == $k){
+            $maxLen = max($maxLen, $i+1);
+        }
+        $remaining = $sum - $k;
+
+        if(isset($hashMap[$remaining])){
+            $maxLen = max($maxLen, $i-$hashMap[$remaining]);
+        }
+
+        if(!isset($hashMap[$sum])){
+            $hashMap[$sum] = $i;
+        }
+
+    }
+
+    return $maxLen;
+    
+}
+
+echo "     Output: Length = " . longestSubarrayWithSumKForPositive([10, 5, 2, 7, 1, 9], 15) . "\n\n";
+
+
 
 
 // ─────────────────────────────────────────────────────────────────────────────

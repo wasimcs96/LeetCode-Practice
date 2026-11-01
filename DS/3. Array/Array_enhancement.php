@@ -3816,6 +3816,73 @@ print_r(fourSum([1, 0, -1, 0, -2, 2], 0));
 //      self-test before declaring the solution done.
 //    - Integer overflow (in fixed-width-integer languages) -> four summed
 //
+
+function maxProduct(array $nums) {
+    $arrLength = count($nums);
+    if($arrLength == 0) return 0;
+
+    $preFixProduct = $suffixProduct = 1; $maxProduct = -2147483648;
+    
+    for($i=0;$i<$arrLength;$i++){
+        $preFixProduct = $preFixProduct*$nums[$i];
+        $suffixProduct = $suffixProduct*$nums[$arrLength-$i-1];
+
+        $maxProduct = max($maxProduct, $preFixProduct, $suffixProduct);
+
+        if($preFixProduct == 0) $preFixProduct = 1;
+        if($suffixProduct == 0) $suffixProduct = 1;
+    }
+
+    return $maxProduct;
+    // $result = $nums[0];
+    // for($i=0;$i<$arrLength;$i++){
+    //     $p = $nums[$i];
+    //     for($j=$i+1;$j<$arrLength;$j++){
+    //         $result = max($result, $p);
+    //         $p *= $nums[$j];
+    //     }
+    //     $result = max($result, $p);
+    // }
+    // return $result;
+}
+
+$nums = [2,-5,-2,-4,3];
+echo maxProduct($nums);
+
+
+function productExceptSelf($nums) {
+    $arrLength = count($nums);
+    
+    $suffixProductArr = $prefixProdcutArr = []; $suffixProduct = $prefixProdcut = 1; $answer = [];
+    // for($i = 0; $i < $arrLength; $i++){
+    //     $prefixProdcut *= $nums[$i];
+    //     $prefixProdcutArr[$i] = $prefixProdcut;
+
+    //     $suffixProduct *= $nums[$arrLength - $i - 1];
+    //     $suffixProductArr[$arrLength - $i - 1] = $suffixProduct;
+    // }
+
+    // for($i = 0; $i < $arrLength; $i++){
+    //     $answer[$i] = ($prefixProdcutArr[$i-1] ?? 1) * ($suffixProductArr[$i+1] ?? 1);
+    // }
+    $answer[0] = 1;
+    for($i = 1; $i < $arrLength; $i++){
+        $answer[$i] = $answer[$i-1] * $nums[$i-1];
+    }
+    $suffixProduct = 1;
+    for($i = $arrLength-1; $i >= 0; $i--){
+        $answer[$i] = $answer[$i] * $suffixProduct;
+        $suffixProduct *= $nums[$i];
+    }
+
+
+
+    return $answer;
+    
+}
+
+print_r(productExceptSelf([1,2,3,4]));
+//print_r(productExceptSelf([-1,1,0,-3,3]));
 //  --- 🧪 Additional Senior-Level Prep (tests, gotchas, follow-ups) ---
 //  assert(threeSum([-1,0,1,2,-1,-4]) === [[-1,-1,2],[-1,0,1]]);
 //  assert(threeSum([0,0,0]) === [[0,0,0]]);            // heavy duplicates -- exercises every skip-guard
